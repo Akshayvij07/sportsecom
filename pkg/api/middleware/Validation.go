@@ -1,0 +1,42 @@
+package middleware
+
+import (
+	"fmt"
+	"time"
+
+	"github.com/golang-jwt/jwt"
+)
+
+func ValidateToken(token string) (int, error) {
+
+	Tokenvalue, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
+		}
+
+		return []byte("SECRET"), nil
+	})
+	if err != nil {
+		return 0, err
+	}
+
+	if Tokenvalue == nil || !Tokenvalue.Valid {
+		return 0, fmt.Errorf("inavlid token")
+	}
+
+	var parsedID interface{}
+	if claims, ok := Tokenvalue.Claims.(jwt.MapClaims); ok && Tokenvalue.Valid {
+		parsedID = claims["id"]
+		if float64(time.Now().Unix()) > claims["exp"].(float64) {
+			return 0, fmt.Errorf("token expired")
+		}
+	}
+
+	value, ok := parsedID.(float64)
+	if !ok {
+		return 0, fmt.Errorf("expected an int value, but got %T", parsedID)
+	}
+	id := int(value)
+
+	return id, err
+}

@@ -3,12 +3,17 @@ package interfaces
 import (
 	"context"
 
-	domain "github.com/thnkrn/go-gin-clean-arch/pkg/domain"
+	"github.com/Akshayvij07/ecommerce/pkg/domain"
+	"github.com/Akshayvij07/ecommerce/pkg/helper/request"
+	"github.com/Akshayvij07/ecommerce/pkg/helper/respondse"
 )
 
 type UserUseCase interface {
-	FindAll(ctx context.Context) ([]domain.Users, error)
-	FindByID(ctx context.Context, id uint) (domain.Users, error)
-	Save(ctx context.Context, user domain.Users) (domain.Users, error)
-	Delete(ctx context.Context, user domain.Users) error
+	SignUp(ctx context.Context, user request.UserSign) (respondse.UserValue, error)
+	Login(ctx context.Context, user request.Login) (string, error)
+	OtpLogin(mobno string) (string, error)
+	AddAdress(ctx context.Context, UserID int, address request.AddressReq) (domain.Address, error)
+	UpdateAdress(ctx context.Context, UserID int, address request.AddressReq) (domain.Address, error)
+	VeiwAdress(ctx context.Context, UserID int) (domain.Address, error)
+	ChangePassword(ctx context.Context, User request.Password) error
 }

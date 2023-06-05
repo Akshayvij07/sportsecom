@@ -1,32 +1,1174 @@
 definitions:
-  handler.Response:
+  domain.Admin:
     properties:
+      admin_name:
+        maxLength: 12
+        minLength: 4
+        type: string
+      email:
+        type: string
       id:
         type: integer
+      password:
+        maxLength: 16
+        minLength: 8
+        type: string
+    required:
+    - password
+    type: object
+  request.Addcount:
+    properties:
+      count:
+        minimum: 1
+        type: integer
+      product_id:
+        type: integer
+    required:
+    - product_id
+    type: object
+  request.AddressReq:
+    properties:
+      city:
+        type: string
+      district:
+        type: string
+      house_number:
+        type: string
+      landmark:
+        type: string
+      pincode:
+        type: string
+      street:
+        type: string
+    type: object
+  request.AdminLogin:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  request.BlockUser:
+    properties:
+      reason:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  request.Cartreq:
+    properties:
+      productId:
+        type: integer
+    type: object
+  request.Category:
+    properties:
       name:
         type: string
-      surname:
+    required:
+    - name
+    type: object
+  request.Login:
+    properties:
+      email:
         type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  request.OTPreq:
+    properties:
+      phoneNumber:
+        type: string
+    required:
+    - phoneNumber
+    type: object
+  request.Otpverifier:
+    properties:
+      phoneNumber:
+        type: string
+      pin:
+        type: string
+    required:
+    - phoneNumber
+    - pin
+    type: object
+  request.Password:
+    properties:
+      new_password:
+        type: string
+      old_password:
+        type: string
+    type: object
+  request.Product:
+    properties:
+      brand:
+        type: string
+      categoryid:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      prize:
+        type: integer
+      qty_in_stock:
+        type: integer
+    required:
+    - brand
+    - categoryid
+    - description
+    - name
+    type: object
+  request.Update:
+    properties:
+      order_id:
+        type: integer
+      status_id:
+        type: integer
+    required:
+    - order_id
+    - status_id
+    type: object
+  request.UserSign:
+    properties:
+      confirm_password:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      phone_number:
+        type: string
+    required:
+    - confirm_password
+    - email
+    - name
+    - password
+    - phone_number
+    type: object
+  respondse.Response:
+    properties:
+      data: {}
+      error: {}
+      message:
+        type: string
+      stastuscode:
+        type: integer
     type: object
 info:
   contact: {}
 paths:
-  /api/users:
-    get:
-      description: Get all users
-      operationId: FindAll
+  /SaveAddress:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user with the specified details.
+      operationId: Add_Adress
+      parameters:
+      - description: Input Field
+        in: body
+        name: inputs
+        required: true
+        schema:
+          $ref: '#/definitions/request.AddressReq'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            items:
-              $ref: '#/definitions/handler.Response'
-            type: array
+            $ref: '#/definitions/respondse.Response'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: AddAdrress_for_user
+      tags:
+      - UsersAddress
+  /UpdateAddress:
+    patch:
+      consumes:
+      - application/json
+      description: Update user Adresses.
+      operationId: Update_Adress
+      parameters:
+      - description: Input Field
+        in: body
+        name: inputs
+        required: true
+        schema:
+          $ref: '#/definitions/request.AddressReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: updateAdrress_for_user
+      tags:
+      - UsersAddress
+  /UpdatePassword:
+    patch:
+      consumes:
+      - application/json
+      description: Update user Password.
+      operationId: Update_Password
+      parameters:
+      - description: Input Field
+        in: body
+        name: inputs
+        required: true
+        schema:
+          $ref: '#/definitions/request.Password'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: updatePassword_for_user
+      tags:
+      - EditUsers
+  /admin/block:
+    patch:
+      consumes:
+      - application/json
+      description: Admin can block a  user
+      operationId: block-user
+      parameters:
+      - description: inputs
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/request.BlockUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: Admin can block a user
+      tags:
+      - Admin
+  /admin/category/add:
+    post:
+      consumes:
+      - application/json
+      description: Admin can create new category from admin panel
+      operationId: create-category
+      parameters:
+      - description: New category name
+        in: body
+        name: category_name
+        required: true
+        schema:
+          $ref: '#/definitions/request.Category'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: Create new product category
+      tags:
+      - Product Category
+  /admin/category/delete/{category_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Admin can delete a category
+      operationId: delete-category
+      parameters:
+      - description: category_id
+        in: path
+        name: category_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: Admin can delete a category
+      tags:
+      - Product Category
+  /admin/category/update/{id}:
+    patch:
+      consumes:
+      - application/json
+      description: Admin can update category details
+      operationId: update-category
+      parameters:
+      - description: ID of the Category to be updated
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: category info
+        in: body
+        name: category_details
+        required: true
+        schema:
+          $ref: '#/definitions/request.Category'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: Admin can update category details
+      tags:
+      - Product Category
+  /admin/findall:
+    get:
+      consumes:
+      - application/json
+      operationId: FindAllUsers
+      parameters:
+      - description: Page number for pagination
+        in: query
+        name: page
+        type: integer
+      - description: Number of items to retrieve per page
+        in: query
+        name: perPage
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: FindAllUsers
+      tags:
+      - Admin
+  /admin/finduser/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: Admin can fetch a specific user details using user id
+      operationId: find-user-by-id
+      parameters:
+      - description: ID of the user to be fetched
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: Admin can fetch a specific  user details using id
+      tags:
+      - Admin
+  /admin/login:
+    post:
+      consumes:
+      - application/json
+      description: Login admin with details
+      operationId: LogInAdmin
+      parameters:
+      - description: Input Field
+        in: body
+        name: inputs
+        required: true
+        schema:
+          $ref: '#/definitions/request.AdminLogin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: LoginAdmin
+      tags:
+      - Admin
+  /admin/logout:
+    post:
+      description: Logout as a user exit from the ecommerce site
+      operationId: AdminLogout
+      responses:
+        "200":
+          description: Success
+        "400":
+          description: Failed
+      summary: AdminLogout
+      tags:
+      - Admin
+  /admin/order/Allorders:
+    get:
+      consumes:
+      - application/json
+      operationId: FindAllordersInshop
+      parameters:
+      - description: Page number for pagination
+        in: query
+        name: page
+        type: integer
+      - description: Number of items to retrieve per page
+        in: query
+        name: perPage
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: FindAllorders In admin side
+      tags:
+      - AdminOrder
+  /admin/order/Status:
+    get:
+      consumes:
+      - application/json
+      description: Endpoint for getting all orderStatuses
+      operationId: List-all-orderStatus
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: for geting all order status list
+      tags:
+      - AdminOrder
+  /admin/order/UpdateStatus:
+    patch:
+      consumes:
+      - application/json
+      description: update the order statuses by every orderid.
+      operationId: Order_status
+      parameters:
+      - description: Input Field
+        in: body
+        name: inputs
+        required: true
+        schema:
+          $ref: '#/definitions/request.Update'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: Updateorderstatus
+      tags:
+      - AdminOrder
+  /admin/product/ViewAllProducts:
+    get:
+      consumes:
+      - application/json
+      description: users can ses all available products
+      operationId: admin-view-all-products
+      parameters:
+      - description: Page number for pagination
+        in: query
+        name: page
+        type: integer
+      - description: Number of items to retrieve per page
+        in: query
+        name: perPage
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: Admins and users can see all available products
+      tags:
+      - Product
+  /admin/product/ViewProduct/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Admins and users can see products with product id
+      operationId: find-product-by-id
+      parameters:
+      - description: product id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: Admins and users can see products with product id
+      tags:
+      - Product
+  /admin/product/delete/{product_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Admin can delete a product
+      operationId: delete-product
+      parameters:
+      - description: product_id
+        in: path
+        name: product_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: Admin can delete a product
+      tags:
+      - Product
+  /admin/product/save:
+    post:
+      consumes:
+      - application/json
+      description: Admins can create new product listings
+      operationId: create-product
+      parameters:
+      - description: new product details
+        in: body
+        name: new_product_details
+        required: true
+        schema:
+          $ref: '#/definitions/request.Product'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: Admin can create new product listings
+      tags:
+      - Product
+  /admin/product/updateproduct/{id}:
+    patch:
+      consumes:
+      - application/json
+      description: Admin can update Product details
+      operationId: update-Product
+      parameters:
+      - description: ID of the product to be updated
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Product info
+        in: body
+        name: category_details
+        required: true
+        schema:
+          $ref: '#/definitions/request.Product'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: Admin can update Product details
+      tags:
+      - Product
+  /admin/signup:
+    post:
+      consumes:
+      - application/json
+      description: Save admin with details
+      operationId: SaveAdmin
+      parameters:
+      - description: Input Field
+        in: body
+        name: inputs
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Admin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: SaveAdmin
+      tags:
+      - Admin
+  /admin/unblock/{user_id}:
+    patch:
+      consumes:
+      - application/json
+      description: Admin can unblock a blocked user
+      operationId: unblock-user
+      parameters:
+      - description: ID of the user to be unblocked
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: Admin can unblock a blocked user
+      tags:
+      - Admin
+  /cart/Addcount:
+    put:
+      consumes:
+      - application/json
+      description: user can delete their cartitems by id
+      operationId: Add-Qantity
+      parameters:
+      - description: Input Field
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/request.Addcount'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: User can delete a item
+      tags:
+      - UsersCart
+  /cart/add/item:
+    post:
+      consumes:
+      - application/json
+      description: user can add stock of product to user cart
+      parameters:
+      - description: Input Field info
+        in: body
+        name: inputs
+        required: true
+        schema:
+          $ref: '#/definitions/request.Cartreq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: api for adding product to user cart
+      tags:
+      - UsersCart
+  /cart/remove/item:
+    delete:
+      consumes:
+      - application/json
+      description: user can reduce stock of product to user cart
+      parameters:
+      - description: Input Field info
+        in: body
+        name: inputs
+        required: true
+        schema:
+          $ref: '#/definitions/request.Cartreq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: api for removing product from user cart
+      tags:
+      - UsersCart
+  /cart/viewcart:
+    get:
+      description: user can see all productItem that stored in cart
+      operationId: Cart
+      responses:
+        "200":
+          description: successfully got user cart items
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "500":
+          description: faild to get cart items
+          schema:
+            $ref: '#/definitions/respondse.Response'
       security:
       - ApiKeyAuth: []
-      summary: Get all users
+      summary: api for get all cart item of user
       tags:
-      - users
+      - UsersCart
+  /category/disply/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Users and admins can fetch details of a specific category using
+        id
+      operationId: find-category-by-id
+      parameters:
+      - description: category id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: Fetch details of a specific category using category id
+      tags:
+      - Product Category
+  /category/showall:
+    get:
+      consumes:
+      - application/json
+      description: Admin, users and unregistered users can see all the available categories
+      operationId: view-all-categories
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: View all available categories
+      tags:
+      - Product Category
+  /home:
+    get:
+      description: landing page for users
+      operationId: Homepage
+      responses:
+        "200":
+          description: success
+        "400":
+          description: failed
+      summary: HomePage
+      tags:
+      - Users
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Login as a user to access the ecommerce site
+      operationId: UserLogin
+      parameters:
+      - description: Input Field
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/request.Login'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: User Login
+      tags:
+      - Users
+  /logout:
+    post:
+      description: Logout as a user exit from the ecommerce site
+      operationId: UserLogout
+      responses:
+        "200":
+          description: success
+        "400":
+          description: Failed
+      summary: User Login
+      tags:
+      - Users
+  /order/cancel/{orderId}:
+    patch:
+      consumes:
+      - application/json
+      description: Endpoint for cancelling an order associated with a user
+      operationId: cancel-order
+      parameters:
+      - description: ID of the order to be cancelled
+        in: path
+        name: orderId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: Cancels a specific order for the currently logged in user
+      tags:
+      - UserOrder
+  /order/listall:
+    get:
+      consumes:
+      - application/json
+      description: Endpoint for getting all orders
+      operationId: List-all-orders
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: for geting all order list
+      tags:
+      - UserOrder
+  /order/place_order/{payment_id}:
+    post:
+      consumes:
+      - application/json
+      description: This endpoint allows a user to purchase all items in their cart
+      operationId: buyAll
+      parameters:
+      - description: payment_id
+        in: path
+        name: payment_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: Buy all items from the user's cart
+      tags:
+      - UserOrder
+  /order/return/{orderId}:
+    patch:
+      consumes:
+      - application/json
+      description: Endpoint for Returning an order associated with a user
+      operationId: return-order
+      parameters:
+      - description: ID of the order to be Returned
+        in: path
+        name: orderId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: Return a specific order for the currently logged in user
+      tags:
+      - UserOrder
+  /order/view/{order_id}:
+    get:
+      consumes:
+      - application/json
+      description: retrieving the details of a specific order identified by its order
+        ID.
+      operationId: view-order-by-id
+      parameters:
+      - description: Order ID
+        in: path
+        name: order_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully fetched order details
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Failed to fetch order details
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: to get order details
+      tags:
+      - UserOrder
+  /otp/send:
+    post:
+      consumes:
+      - application/json
+      description: Send OTP to use's mobile
+      operationId: send-otp
+      parameters:
+      - description: User mobile number
+        in: body
+        name: user_mobile
+        required: true
+        schema:
+          $ref: '#/definitions/request.OTPreq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: Send OTP to user's mobile
+      tags:
+      - Otp
+  /otp/verify:
+    post:
+      consumes:
+      - application/json
+      description: Validate the  OTP sent to use's mobile
+      operationId: validate-otp
+      parameters:
+      - description: OTP sent to user's mobile number
+        in: body
+        name: otp
+        required: true
+        schema:
+          $ref: '#/definitions/request.Otpverifier'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: Validate the OTP to user's mobile
+      tags:
+      - Otp
+  /product/AllProducts:
+    get:
+      consumes:
+      - application/json
+      description: users can ses all available products
+      operationId: user-view-all-products
+      parameters:
+      - description: Page number for pagination
+        in: query
+        name: page
+        type: integer
+      - description: Number of items to retrieve per page
+        in: query
+        name: perPage
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: users can see all available products
+      tags:
+      - Users
+  /signup:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user with the specified details
+      operationId: UserSignup
+      parameters:
+      - description: Input Field
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/request.UserSign'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: User Signup
+      tags:
+      - Users
+  /viewAddress:
+    get:
+      description: user can see their Adress
+      operationId: User_Address
+      responses:
+        "200":
+          description: successfully get Address
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "500":
+          description: faild to get Address
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: api for get address of user
+      tags:
+      - UsersAddress
 swagger: "2.0"

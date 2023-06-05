@@ -3,37 +3,32 @@ package middleware
 import (
 	"fmt"
 	"net/http"
-	"strings"
-	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt"
 )
 
-func AuthorizationMiddleware(c *gin.Context) {
-	s := c.Request.Header.Get("Authorization")
+func UserAuth(c *gin.Context) {
+	//s := c.Request.Header.Get("Authorization")
 
-	token := strings.TrimPrefix(s, "Bearer ")
+	tokenString, err := c.Cookie("UserAuth")
+	fmt.Println("test1",tokenString,err)
 
-	if err := validateToken(token); err != nil {
+	if err != nil {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
+
+	userId, err := ValidateToken(tokenString)
+
+	if err != nil {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+	c.Set("userId", userId)
+	c.Next()
 }
 
-func validateToken(token string) error {
-	_, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
-		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
-		}
-
-		return []byte("secret"), nil
-	})
-
-	return err
-}
-
-func LoginHandler(c *gin.Context) {
+/*func LoginHandler(c *gin.Context) {
 	// implement login logic here
 	// user := c.PostForm("user")
 	// pass := c.PostForm("pass")
@@ -66,4 +61,4 @@ func LoginHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"token": ss,
 	})
-}
+}*/

@@ -5,34 +5,113 @@ import (
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	_ "github.com/thnkrn/go-gin-clean-arch/cmd/api/docs"
-	handler "github.com/thnkrn/go-gin-clean-arch/pkg/api/handler"
-	middleware "github.com/thnkrn/go-gin-clean-arch/pkg/api/middleware"
+	_ "github.com/Akshayvij07/ecommerce/cmd/api/docs"
+	handler "github.com/Akshayvij07/ecommerce/pkg/api/handler"
+	"github.com/Akshayvij07/ecommerce/pkg/api/middleware"
 )
 
 type ServerHTTP struct {
 	engine *gin.Engine
 }
 
-func NewServerHTTP(userHandler *handler.UserHandler) *ServerHTTP {
+func NewServerHTTP(userHandler *handler.UserHandler,
+	otpHandler *handler.OtpHandler,
+	AdminHandler *handler.AdminHandler, ProductHandler *handler.ProductHandler, CartHandler *handler.CartHandler, OrderHandler *handler.OrderHandler) *ServerHTTP {
 	engine := gin.New()
 
 	// Use logger from Gin
 	engine.Use(gin.Logger())
 
+	//engine.LoadHTMLGlob("./*html")
+
 	// Swagger docs
 	engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	// Request JWT
-	engine.POST("/login", middleware.LoginHandler)
 
 	// Auth middleware
-	api := engine.Group("/api", middleware.AuthorizationMiddleware)
 
-	api.GET("users", userHandler.FindAll)
-	api.GET("users/:id", userHandler.FindByID)
-	api.POST("users", userHandler.Save)
-	api.DELETE("users/:id", userHandler.Delete)
+	user := engine.Group("/")
+	{
+
+		user.POST("signup", userHandler.SignUp)
+		user.POST("login", userHandler.Login)
+		user.POST("otp/send", otpHandler.SendOtp)
+		user.POST("otp/verify", otpHandler.ValidateOtp)
+		//user.POST("logout", userHandler.LogOut)
+
+	}
+	user.Use(middleware.UserAuth)
+	{
+		user.GET("home", userHandler.Home)
+		user.POST("logout", userHandler.LogOut)
+		user.POST("SaveAddress", userHandler.AddAdress)
+		user.PATCH("UpdateAddress", userHandler.UpdateAdress)
+		user.GET("viewAddress", userHandler.VeiwAddress)
+		user.PATCH("edit", userHandler.EditUser)
+		user.PATCH("UpdatePassword", userHandler.ChangePassword)
+		category := user.Group("/category")
+		{
+			category.GET("showall", ProductHandler.ListCategories)
+			category.GET("dispaly/:id", ProductHandler.DisplayCategory)
+		}
+		product := user.Group("/product")
+		{
+			product.GET("AllProducts", ProductHandler.UserProductslist)
+		}
+		cart := user.Group("/cart")
+		{
+			cart.POST("add/item", CartHandler.AddItemToCart)
+			cart.DELETE("remove/item", CartHandler.RemoveItem)
+			cart.PUT("/Addcount", CartHandler.Addcount)
+			cart.GET("/viewcart", CartHandler.ViewCartItems)
+		}
+		order := user.Group("/order")
+		{
+			order.POST("/place_order/:payment_id", OrderHandler.CashonDElivery)
+			order.PATCH("/cancel/:orderId", OrderHandler.CancelOrder)
+			order.GET("/view/:order_id", OrderHandler.ListOrder)
+			order.GET("/listall", OrderHandler.ListAllOrders)
+			order.PATCH("/return/:orderId", OrderHandler.ReturnOrder)
+		}
+	}
+	admin := engine.Group("/admin")
+
+	admin.POST("/signup", AdminHandler.SaveAdmin)
+	admin.POST("/login", AdminHandler.LoginAdmin)
+
+	admin.Use(middleware.AdminAuth)
+	{
+		admin.POST("/logout", AdminHandler.AdminLogout)
+		admin.GET("/findall", AdminHandler.FindAllUser)
+		admin.GET("/finduser/:user_id", AdminHandler.FindUserByID)
+		admin.PATCH("/block", AdminHandler.BlockUser)
+		admin.PATCH("/unblock/:user_id", AdminHandler.UnblockUser)
+		//category
+		category := admin.Group("/category")
+		{
+			category.POST("add", ProductHandler.Addcategory)
+			category.PATCH("update/:id", ProductHandler.UpdatCategory)
+			category.DELETE("delete/:category_id", ProductHandler.DeleteCategory)
+			category.GET("showall/", ProductHandler.ListCategories)
+			category.GET("disply/:id", ProductHandler.DisplayCategory)
+		}
+		product := admin.Group("/product")
+		{
+
+			product.POST("save", ProductHandler.SaveProduct)
+			product.PATCH("updateproduct/:id", ProductHandler.UpdateProduct)
+			product.DELETE("delete/:product_id", ProductHandler.DeleteProduct)
+			product.GET("ViewAllProducts", ProductHandler.ViewAllProductS)
+			product.GET("ViewProduct/:id", ProductHandler.VeiwProduct)
+		}
+		order := admin.Group("/order")
+		{
+			order.GET("/Status", OrderHandler.Statuses)
+			order.GET("/Allorders", OrderHandler.AllOrders)
+			order.PATCH("/UpdateStatus", OrderHandler.UpdateOrderStatus)
+		}
+	}
 
 	return &ServerHTTP{engine: engine}
 }
