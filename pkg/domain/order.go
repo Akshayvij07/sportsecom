@@ -20,11 +20,13 @@ type Orders struct {
 	PaymentMethodID   uint          `json:"payment_method_id"`
 	PaymentMethod     PaymentMethod `gorm:"foreignKey:PaymentMethodID" json:"-"`
 	ShippingAddressID uint          `json:"shipping_address_id"`
-	Address           Address       `gorm:"foreignKey:ShippingAddressID" json:"-"`
+	UserAddress       UserAddress   `gorm:"foreignKey:ShippingAddressID" json:"-"`
 	OrderTotal        float64       `json:"order_total"`
 	OrderStatusID     uint          `json:"order_status_id"`
 	OrderStatus       OrderStatus   `gorm:"foreignKey:OrderStatusID" json:"-"`
 	DeliveryUpdatedAt time.Time     `json:"delivery_time"`
+	Discount          float64       `json:"discount"`
+	CouponCode        string        `json:"coupon_code"`
 }
 
 type OrderLine struct {
@@ -54,7 +56,7 @@ type PaymentDetails struct {
 	OrderTotal      float64       `json:"order_total"`
 	PaymentMethodID uint          `json:"payment_method_id"`
 	PaymentMethod   PaymentMethod `gorm:"foreignKey:PaymentMethodID"`
-	//PaymentStatusID uint          `json:"payment_status_id,omitempty"`
-	//PaymentStatus   PaymentStatus `gorm:"foreignKey:PaymentStatusID" json:"-"`
-	UpdatedAt time.Time
+	PaymentStatusID uint          `json:"payment_status_id,omitempty"`
+	PaymentStatus   PaymentStatus `gorm:"foreignKey:PaymentStatusID" json:"-"`
+	UpdatedAt       time.Time
 }

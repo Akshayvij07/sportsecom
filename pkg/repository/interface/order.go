@@ -17,5 +17,5 @@ type OrderRepo interface {
 	Listorder(ctx context.Context, Orderid int, UserId int) (order domain.Orders, err error)
 	Listorders(ctx context.Context) ([]respondse.OrderResponse, error)
 	CancelOrder(ctx context.Context, orderId, userId int) error
-	UListorders(ctx context.Context,UserId int) ([]respondse.OrderResponse, error)
+	UListorders(ctx context.Context,UserId int) ([]respondse.UserOrderResponse, error)
 }

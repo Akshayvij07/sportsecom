@@ -34,6 +34,8 @@ definitions:
         type: string
       house_number:
         type: string
+      is_default:
+        type: boolean
       landmark:
         type: string
       pincode:
@@ -69,6 +71,25 @@ definitions:
         type: string
     required:
     - name
+    type: object
+  request.Coupon:
+    properties:
+      discountpercent:
+        type: number
+      expirationdate:
+        type: string
+      maximumdiscountprice:
+        type: number
+      minimumpurchaseamount:
+        type: number
+      usagelimit:
+        type: integer
+    required:
+    - discountpercent
+    - expirationdate
+    - maximumdiscountprice
+    - minimumpurchaseamount
+    - usagelimit
     type: object
   request.Login:
     properties:
@@ -165,6 +186,52 @@ definitions:
 info:
   contact: {}
 paths:
+  /Addwishlist/{product_id}:
+    post:
+      operationId: AddToWishList
+      parameters:
+      - description: product_id
+        in: path
+        name: product_id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: successfully added product to wishlist
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: invalid input
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: api to add a product to wish list
+      tags:
+      - Wishlist
+  /Removewishlist/{product_id}:
+    delete:
+      operationId: RemoveFromWishList
+      parameters:
+      - description: product_id
+        in: path
+        name: product_id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: successfully removed product item from wishlist
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: invalid input
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      security:
+      - ApiKeyAuth: []
+      summary: api to remove a product from wish list
+      tags:
+      - Wishlist
   /SaveAddress:
     post:
       consumes:
@@ -362,6 +429,131 @@ paths:
       summary: Admin can update category details
       tags:
       - Product Category
+  /admin/coupon/AddCoupons:
+    post:
+      description: Admin can add coupon
+      operationId: AddCoupon
+      parameters:
+      - description: Input true info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/request.Coupon'
+      responses:
+        "200":
+          description: Successfully productItem added to cart
+        "400":
+          description: can't add the product item into cart
+      security:
+      - ApiKeyAuth: []
+      summary: api for add Coupons for ecommerce
+      tags:
+      - Coupon
+  /admin/coupon/Delete/{CouponID}:
+    delete:
+      consumes:
+      - application/json
+      description: Admin can delete a coupon
+      operationId: delete-coupon
+      parameters:
+      - description: CouponID
+        in: path
+        name: CouponID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: Admin can delete a coupon
+      tags:
+      - Coupon
+  /admin/coupon/Update/{CouponID}:
+    patch:
+      consumes:
+      - application/json
+      description: Admin can update existing coupon
+      operationId: update-coupon
+      parameters:
+      - description: CouponID
+        in: path
+        name: CouponID
+        required: true
+        type: integer
+      - description: details of coupon to be updated
+        in: body
+        name: coupon_details
+        required: true
+        schema:
+          $ref: '#/definitions/request.Coupon'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: Admin can update existing coupon
+      tags:
+      - Coupon
+  /admin/coupon/Viewcoupon/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Admins can see Coupons with coupon_id
+      operationId: find-Coupon-by-id
+      parameters:
+      - description: CouponID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: Admins  can see Coupons with coupon_id
+      tags:
+      - Coupon
+  /admin/coupon/couponlist:
+    get:
+      consumes:
+      - application/json
+      description: Endpoint for getting all coupons
+      operationId: List-all-coupons
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: for geting all order status list
+      tags:
+      - Coupon
   /admin/findall:
     get:
       consumes:
@@ -879,6 +1071,52 @@ paths:
       summary: View all available categories
       tags:
       - Product Category
+  /coupon/apply/{code}:
+    patch:
+      consumes:
+      - application/json
+      description: User can apply coupon to the cart
+      operationId: applay-coupon-to-cart
+      parameters:
+      - description: code
+        in: query
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: User can apply a coupon to the cart
+      tags:
+      - UsersCart
+  /coupon/coupons:
+    get:
+      consumes:
+      - application/json
+      description: Endpoint for getting all coupons in user side
+      operationId: List-all-coupons-user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: for geting all coupon list
+      tags:
+      - Users
   /home:
     get:
       description: landing page for users
@@ -995,7 +1233,7 @@ paths:
             $ref: '#/definitions/respondse.Response'
       summary: Buy all items from the user's cart
       tags:
-      - UserOrder
+      - Cart
   /order/return/{orderId}:
     patch:
       consumes:
@@ -1171,4 +1409,17 @@ paths:
       summary: api for get address of user
       tags:
       - UsersAddress
+  /wishlist:
+    get:
+      operationId: GetWishListI
+      responses:
+        "200":
+          description: Wish list is empty
+        "400":
+          description: faild to get user wish list items
+      security:
+      - ApiKeyAuth: []
+      summary: api get all wish list items of user
+      tags:
+      - Wishlist
 swagger: "2.0"

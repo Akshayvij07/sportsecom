@@ -51,7 +51,9 @@ func (c *CartUseCase) AddCartItem(ctx context.Context, body request.Cartreq) err
 	if err != nil {
 		return err
 	} else if cartItem.Id != 0 {
-		return errors.New("product is allready save in cart")
+		//return errors.New("product is allready save in cart")
+		c.CartRepo.AddQuantity(ctx, cartItem, 1)
+		return nil
 	}
 	fmt.Println(cart.Id)
 	cartitem := domain.CartItem{

@@ -8,7 +8,6 @@ import (
 
 	config "github.com/Akshayvij07/ecommerce/pkg/config"
 	domain "github.com/Akshayvij07/ecommerce/pkg/domain"
-	"github.com/Akshayvij07/ecommerce/pkg/domain/category"
 )
 
 func ConnectDatabase(cfg config.Config) (*gorm.DB, error) {
@@ -27,8 +26,9 @@ func ConnectDatabase(cfg config.Config) (*gorm.DB, error) {
 		&domain.UserStatus{},
 		&domain.Admin{},
 		&domain.Address{},
-		&category.Category{},
-		&category.SubCategory{},
+		&domain.UserAddress{},
+		&domain.Category{},
+		//&category.SubCategory{},
 		&domain.Product{},
 		&domain.Cart{},
 		&domain.CartItem{},
@@ -37,7 +37,8 @@ func ConnectDatabase(cfg config.Config) (*gorm.DB, error) {
 		&domain.OrderLine{},
 		&domain.PaymentDetails{},
 		&domain.PaymentMethod{},
-		
+		domain.Coupon{},
+		domain.WishList{},
 	)
 	//update triggers
 	err := db.Exec(cartTotalPriceUpdate).Error

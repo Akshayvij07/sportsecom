@@ -1,10 +1,10 @@
 package request
 
 type UserSign struct {
-	Name     string `json:"name" binding:"required"`
-	Email    string `json:"email" binding:"required"`
-	Phone    string `json:"phone_number" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	Name            string `json:"name" binding:"required"`
+	Email           string `json:"email" binding:"required"`
+	Phone           string `json:"phone_number" binding:"required"`
+	Password        string `json:"password" binding:"required"`
 	ConfirmPassword string `json:"confirm_password" binding:"required"`
 }
 
@@ -26,7 +26,7 @@ type BlockUser struct {
 	Reason string `json:"reason"`
 }
 type Password struct {
-	UserID        int   `json:"-"`
+	UserID      int    `json:"-"`
 	OldPassword string `json:"old_password"`
 	NewPassword string `json:"new_password"`
 }
@@ -38,6 +38,7 @@ type AddressReq struct {
 	District    string `json:"district"`
 	Pincode     string `json:"pincode"`
 	Landmark    string `json:"landmark"`
+	IsDefault   *bool  `json:"is_default"`
 }
 
 /*type OTPverify struct{

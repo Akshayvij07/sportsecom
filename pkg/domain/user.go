@@ -21,7 +21,7 @@ type UserStatus struct {
 	ReasonForBlocking string
 }
 
-type Cart struct {
+/*type Cart struct {
 	Id          uint    `gorm:"primaryKey;unique;not null"`
 	UsersID     uint    `json:"users_id"`
 	Users       Users   `gorm:"foreignKey:users_id"`
@@ -36,16 +36,25 @@ type CartItem struct {
 	Product   Product `json:"-"`
 	Qty       uint    `json:"qty" gorm:"not null"`
 	prize     int
+}*/
+
+type UserAddress struct {
+	ID        uint    `json:"id" gorm:"primaryKey;unique"`
+	UsersID   uint    `json:"users_id" gorm:"not null"`
+	Users     Users  
+	AddressID uint    `json:"address_id" gorm:"not null"`
+	Address   Address 
+	IsDefault bool    `json:"is_default"`
 }
 
 type Address struct {
-	ID          uint   `json:"id"`
-	UserID      uint   `json:"user_id"`
-	Users       Users  `gorm:"foreignKey:UserID" json:"-"`
-	HouseNumber string `json:"house_number"`
-	Street      string `json:"street"`
-	City        string `json:"city"`
-	District    string `json:"district"`
-	Pincode     string `json:"pincode"`
-	Landmark    string `json:"landmark"`
+	ID          uint      `json:"id" gorm:"primaryKey;unique"`
+	HouseNumber string    `json:"house_number"`
+	Street      string    `json:"street"`
+	City        string    `json:"city"`
+	District    string    `json:"district"`
+	Pincode     string    `json:"pincode"`
+	Landmark    string    `json:"landmark"`
+	CreatedAt   time.Time `json:"created_at" gorm:"not null"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }

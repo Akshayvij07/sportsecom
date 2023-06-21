@@ -16,13 +16,14 @@ type ServerHTTP struct {
 
 func NewServerHTTP(userHandler *handler.UserHandler,
 	otpHandler *handler.OtpHandler,
-	AdminHandler *handler.AdminHandler, ProductHandler *handler.ProductHandler, CartHandler *handler.CartHandler, OrderHandler *handler.OrderHandler) *ServerHTTP {
+	AdminHandler *handler.AdminHandler, ProductHandler *handler.ProductHandler, CartHandler *handler.CartHandler, OrderHandler *handler.OrderHandler,
+	CouponHandler *handler.CouponHandler) *ServerHTTP {
 	engine := gin.New()
 
 	// Use logger from Gin
 	engine.Use(gin.Logger())
 
-	//engine.LoadHTMLGlob("./*html")
+	engine.LoadHTMLGlob("./*html")
 
 	// Swagger docs
 	engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
@@ -50,6 +51,9 @@ func NewServerHTTP(userHandler *handler.UserHandler,
 		user.GET("viewAddress", userHandler.VeiwAddress)
 		user.PATCH("edit", userHandler.EditUser)
 		user.PATCH("UpdatePassword", userHandler.ChangePassword)
+		user.POST("Addwishlist/:id", userHandler.AddToWishList)
+		user.DELETE("/Removewishlist/:id", userHandler.RemoveFromWishList)
+		user.GET("wishlist", userHandler.GetWishList)
 		category := user.Group("/category")
 		{
 			category.GET("showall", ProductHandler.ListCategories)
@@ -58,6 +62,11 @@ func NewServerHTTP(userHandler *handler.UserHandler,
 		product := user.Group("/product")
 		{
 			product.GET("AllProducts", ProductHandler.UserProductslist)
+		}
+		coupon := user.Group("/coupon")
+		{
+			coupon.GET("/coupons", CouponHandler.UserCoupons)
+			coupon.PATCH("/apply/:code", CouponHandler.ApplyCoupon)
 		}
 		cart := user.Group("/cart")
 		{
@@ -69,6 +78,8 @@ func NewServerHTTP(userHandler *handler.UserHandler,
 		order := user.Group("/order")
 		{
 			order.POST("/place_order/:payment_id", OrderHandler.CashonDElivery)
+			order.GET("/razor/:payment_id", OrderHandler.RazorpayCheckout)
+			order.POST("/razor/verify", OrderHandler.RazorpayVerify)
 			order.PATCH("/cancel/:orderId", OrderHandler.CancelOrder)
 			order.GET("/view/:order_id", OrderHandler.ListOrder)
 			order.GET("/listall", OrderHandler.ListAllOrders)
@@ -104,6 +115,15 @@ func NewServerHTTP(userHandler *handler.UserHandler,
 			product.DELETE("delete/:product_id", ProductHandler.DeleteProduct)
 			product.GET("ViewAllProducts", ProductHandler.ViewAllProductS)
 			product.GET("ViewProduct/:id", ProductHandler.VeiwProduct)
+		}
+		coupon := admin.Group("/coupon")
+		{
+			coupon.POST("/AddCoupons", CouponHandler.AddCoupon)
+			coupon.PATCH("/Update/:CouponID", CouponHandler.UpdateCoupon)
+			coupon.DELETE("/Delete/:CouponID", CouponHandler.DeleteCoupon)
+			coupon.GET("/Viewcoupon/:id", CouponHandler.ViewCoupon)
+			coupon.GET("/couponlist", CouponHandler.Coupons)
+
 		}
 		order := admin.Group("/order")
 		{

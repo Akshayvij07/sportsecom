@@ -25,7 +25,7 @@ func NewOrderepository(DB *gorm.DB) interfaces.OrderRepo {
 func (c *OrderDataBase) OrderAll(ctx context.Context, UserID uint, paymentMethodId int) (domain.Orders, error) {
 	tx := c.DB.Begin()
 	var cart domain.Cart
-	findquery := `SELECT *FROM carts WHERE users_id=?`
+	findquery := `SELECT *FROM carts WHERE user_id=?`
 	err := tx.Raw(findquery, UserID).Scan(&cart).Error
 	if err != nil {
 		tx.Rollback()
@@ -34,15 +34,15 @@ func (c *OrderDataBase) OrderAll(ctx context.Context, UserID uint, paymentMethod
 
 	if cart.Total_price == 0 {
 		tx.Rollback()
-		return domain.Orders{}, fmt.Errorf("please makesure you add those items to cart")
+		return domain.Orders{}, fmt.Errorf("please makesure you add items to cart")
 	}
 	if cart.Total_price == 0 {
 		tx.Rollback()
 		return domain.Orders{}, fmt.Errorf("cart 2")
 	}
 	// -------AddressFetch
-	var address domain.Address
-	findaddress := `SELECT *FROM addresses WHERE user_id=?`
+	var address domain.UserAddress
+	findaddress := `SELECT *FROM user_addresses WHERE users_id=?`
 	err = tx.Raw(findaddress, UserID).Scan(&address).Error
 	if err != nil {
 		tx.Rollback()
@@ -108,9 +108,10 @@ func (c *OrderDataBase) OrderAll(ctx context.Context, UserID uint, paymentMethod
 			(orders_id,
 			order_total,
 			payment_method_id,
+			payment_status_id,
 			updated_at)
-			VALUES($1,$2,$3,NOW())`
-	if err = tx.Exec(PaymentDetails, order.ID, order.OrderTotal, paymentMethodId).Error; err != nil {
+			VALUES($1,$2,$3,$4,NOW())`
+	if err = tx.Exec(PaymentDetails, order.ID, order.OrderTotal, paymentMethodId, 1).Error; err != nil {
 		tx.Rollback()
 		return domain.Orders{}, err
 	}
@@ -165,13 +166,31 @@ func (c *OrderDataBase) CancelOrder(ctx context.Context, orderId, userId int) er
 	return nil
 }
 
+
+//func (c *OrderDataBase) RemoveItem(ctx context.Context,)
+
+
+func (c *OrderDataBase) ClearCart(ctx context.Context, cart_id uint) error {
+	//var items request.Cartreq
+	var cart domain.Cart
+	var cartItemes []request.CartItems
+	for _, items := range cartItemes {
+		removefromCart := `DELETE FROM cart_items WHERE cart_id =$1 AND product_id=$2`
+		err := c.DB.Exec(removefromCart, cart, items.ProductId).Error
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (c *OrderDataBase) Listorders(ctx context.Context) ([]respondse.OrderResponse, error) {
 	var orders []respondse.OrderResponse
 	Query := `SELECT o.id, o.users_id, o.order_date, o.payment_method_id, pm.payment_method, o.shipping_address_id,a.house_number,a.street,a.city,a.district,a.pincode,a.landmark,o.order_total, o.order_status_id, os.order_status, o.delivery_updated_at
 	FROM orders o
 	JOIN users u ON o.users_id = u.id
 	JOIN payment_methods pm ON o.payment_method_id = pm.id
-	JOIN addresses a ON o.shipping_address_id = a.id
+	JOIN user_addresses ua ON o.shipping_address_id = ua.id
 	JOIN order_statuses os ON o.order_status_id = os.id`
 	err := c.DB.Raw(Query).Scan(&orders).Error
 	if err != nil {
@@ -180,19 +199,21 @@ func (c *OrderDataBase) Listorders(ctx context.Context) ([]respondse.OrderRespon
 	return orders, nil
 }
 
-func (c *OrderDataBase) UListorders(ctx context.Context, UserId int) ([]respondse.OrderResponse, error) {
-	var orders []respondse.OrderResponse
-	Query := `SELECT o.id, o.users_id, o.order_date, o.payment_method_id, pm.payment_method, o.shipping_address_id,a.house_number,a.street,a.city,a.district,a.pincode,a.landmark,o.order_total, o.order_status_id, os.order_status, o.delivery_updated_at
+func (c *OrderDataBase) UListorders(ctx context.Context, UserId int) (orders []respondse.UserOrderResponse, err error) {
+	//var orders []respondse.OrderResponse
+	//var order domain.Orders
+	Query := `SELECT o.id, o.users_id, o.order_date, o.payment_method_id, pm.payment_method, o.shipping_address_id,o.order_total,o.order_status_id, os.order_status, o.delivery_updated_at
 	FROM orders o
 	JOIN users u ON o.users_id = u.id
 	JOIN payment_methods pm ON o.payment_method_id = pm.id
-	JOIN addresses a ON o.shipping_address_id = a.id
+	JOIN user_addresses ua ON o.shipping_address_id = ua.id  
 	JOIN order_statuses os ON o.order_status_id = os.id
 	WHERE o.users_id = ?`
-	err := c.DB.Raw(Query, UserId).Scan(&orders).Error
+	err = c.DB.Raw(Query, UserId).Scan(&orders).Error
 	if err != nil {
 		return orders, err
 	}
+	fmt.Println(orders)
 	return orders, nil
 }
 

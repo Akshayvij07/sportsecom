@@ -1,23 +1,24 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
-	"github.com/Akshayvij07/ecommerce/pkg/api/utilityHandler"
 	"github.com/Akshayvij07/ecommerce/pkg/helper/request"
 	"github.com/Akshayvij07/ecommerce/pkg/helper/respondse"
 	services "github.com/Akshayvij07/ecommerce/pkg/usecase/interface"
+	"github.com/Akshayvij07/ecommerce/pkg/utilityHandler"
 	"github.com/gin-gonic/gin"
 )
 
 type OrderHandler struct {
-	OrderUsCase services.Orderusecase
+	OrderUseCase services.Orderusecase
 }
 
 func NewOrderHandler(OrderUseCase services.Orderusecase) *OrderHandler {
 	return &OrderHandler{
-		OrderUsCase: OrderUseCase,
+		OrderUseCase: OrderUseCase,
 	}
 }
 
@@ -25,7 +26,7 @@ func NewOrderHandler(OrderUseCase services.Orderusecase) *OrderHandler {
 // @Summary Buy all items from the user's cart
 // @ID buyAll
 // @Description This endpoint allows a user to purchase all items in their cart
-// @Tags UserOrder
+// @Tags Cart
 // @Accept json
 // @Produce json
 // @Param payment_id path string true "payment_id"
@@ -55,7 +56,111 @@ func (cr *OrderHandler) CashonDElivery(ctx *gin.Context) {
 		})
 		return
 	}
-	order, err := cr.OrderUsCase.PlaceOrder(ctx, UserID, PaymentMethodId)
+	order, err := cr.OrderUseCase.PlaceOrder(ctx, UserID, PaymentMethodId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, respondse.Response{
+			StatusCode: 400,
+			Message:    "cant place order",
+			Data:       nil,
+			Errors:     err.Error(),
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, respondse.Response{
+		StatusCode: 200,
+		Message:    "orderplaced",
+		Data:       order,
+		Errors:     nil,
+	})
+}
+
+func (c *OrderHandler) RazorpayCheckout(ctx *gin.Context) {
+	UserID, err := utilityHandler.GetUserIdFromContext(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, respondse.Response{
+			StatusCode: 400,
+			Message:    "cant find userid",
+			Data:       nil,
+			Errors:     err.Error(),
+		})
+		return
+	}
+	paramsId := ctx.Param("payment_id")
+	payment_id, err := strconv.Atoi(paramsId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, respondse.Response{
+			StatusCode: 400,
+			Message:    "bind faild",
+			Data:       nil,
+			Errors:     err.Error(),
+		})
+		return
+	}
+
+	razorPayOrder, err := c.OrderUseCase.Razorpay(ctx, UserID, payment_id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, respondse.Response{
+			StatusCode: 400,
+			Message:    "cant place order",
+			Data:       nil,
+			Errors:     err.Error(),
+		})
+		return
+	}
+	fmt.Println("herer")
+	ctx.HTML(http.StatusOK, "razor.html", razorPayOrder)
+}
+
+func (cr *OrderHandler) RazorpayVerify(ctx *gin.Context) {
+	// "razorpay_payment_id": response.razorpay_payment_id,
+	// "razorpay_order_id": response.razorpay_order_id,
+	// "razorpay_signature": response.razorpay_signature,
+	// "payment_id": payment_id,
+
+	razorPayPaymentId := ctx.Request.PostFormValue("razorpay_payment_id")
+	razorPayOrderId := ctx.Request.PostFormValue("razorpay_order_id")
+	razorpay_signature := ctx.Request.PostFormValue("razorpay_signature")
+	paramsId := ctx.Request.PostFormValue("payment_id")
+
+	userId, err := utilityHandler.GetUserIdFromContext(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, respondse.Response{
+			StatusCode: 400,
+			Message:    "bind faild",
+			Data:       nil,
+			Errors:     err.Error(),
+		})
+		return
+	}
+	paymentid, err := strconv.Atoi(paramsId)
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, respondse.Response{
+			StatusCode: 400,
+			Message:    "bind faild",
+			Data:       nil,
+			Errors:     err.Error(),
+		})
+		return
+	}
+
+	body := request.RazorPayRequest{
+		RazorPayPaymentId:  razorPayPaymentId,
+		RazorPayOrderId:    razorPayOrderId,
+		Razorpay_signature: razorpay_signature,
+	}
+
+	err = cr.OrderUseCase.VerifyRazorPay(ctx, body)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, respondse.Response{
+			StatusCode: 400,
+			Message:    " faild to veify razorpay order",
+			Data:       nil,
+			Errors:     err.Error(),
+		})
+		return
+	}
+	order, err := cr.OrderUseCase.PlaceOrder(ctx, userId, paymentid)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, respondse.Response{
 			StatusCode: 400,
@@ -106,7 +211,7 @@ func (cr *OrderHandler) CancelOrder(ctx *gin.Context) {
 		})
 		return
 	}
-	err = cr.OrderUsCase.CancelOrder(ctx, orderId, UserID)
+	err = cr.OrderUseCase.CancelOrder(ctx, orderId, UserID)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, respondse.Response{
 			StatusCode: 400,
@@ -157,7 +262,7 @@ func (cr *OrderHandler) ListOrder(ctx *gin.Context) {
 		})
 		return
 	}
-	order, err := cr.OrderUsCase.Listorder(ctx, UserID, orderId)
+	order, err := cr.OrderUseCase.Listorder(ctx, UserID, orderId)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, respondse.Response{
 			StatusCode: 400,
@@ -196,7 +301,8 @@ func (cr *OrderHandler) ListAllOrders(ctx *gin.Context) {
 		})
 		return
 	}
-	orders, err := cr.OrderUsCase.UListorders(ctx, UserID)
+	fmt.Println(UserID)
+	orders, err := cr.OrderUseCase.UListorders(ctx, UserID)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, respondse.Response{
 			StatusCode: 400,
@@ -248,7 +354,7 @@ func (cr *OrderHandler) ReturnOrder(ctx *gin.Context) {
 		return
 	}
 
-	returnAmount, err := cr.OrderUsCase.ReturnOrder(UserID, orderId)
+	returnAmount, err := cr.OrderUseCase.ReturnOrder(UserID, orderId)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, respondse.Response{
 			StatusCode: 400,
@@ -277,7 +383,7 @@ func (cr *OrderHandler) ReturnOrder(ctx *gin.Context) {
 // @Failure 400 {object} respondse.Response
 // @Router /admin/order/Status [get]
 func (cr *OrderHandler) Statuses(ctx *gin.Context) {
-	status, err := cr.OrderUsCase.ListofOrderStatuses(ctx)
+	status, err := cr.OrderUseCase.ListofOrderStatuses(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, respondse.Response{
 			StatusCode: 400,
@@ -310,13 +416,13 @@ func (cr *OrderHandler) Statuses(ctx *gin.Context) {
 func (cr *OrderHandler) AllOrders(ctx *gin.Context) {
 	page, err := strconv.Atoi(ctx.Query("page"))
 	if err != nil {
-		
+
 		page = 1
 	}
 
 	perPage, err := strconv.Atoi(ctx.Query("perPage"))
 	if err != nil {
-		
+
 		perPage = 10
 	}
 
@@ -325,7 +431,7 @@ func (cr *OrderHandler) AllOrders(ctx *gin.Context) {
 		PerPage: uint(perPage),
 	}
 
-	orders, err := cr.OrderUsCase.AdminListorders(ctx, ListofOrders)
+	orders, err := cr.OrderUseCase.AdminListorders(ctx, ListofOrders)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, respondse.Response{
 			StatusCode: 400,
@@ -365,7 +471,7 @@ func (cr *OrderHandler) UpdateOrderStatus(ctx *gin.Context) {
 		})
 		return
 	}
-	err = cr.OrderUsCase.UpdateOrderStatus(ctx, Update)
+	err = cr.OrderUseCase.UpdateOrderStatus(ctx, Update)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, respondse.Response{
 			StatusCode: 400,

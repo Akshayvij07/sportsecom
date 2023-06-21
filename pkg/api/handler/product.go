@@ -258,6 +258,7 @@ func (cr *ProductHandler) SaveProduct(c *gin.Context) {
 		return
 	}
 	newProduct, err := cr.ProductUsecase.SaveProduct(c.Request.Context(), product)
+	//sku:=utilityHandler.GenerateSKU()
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, respondse.Response{

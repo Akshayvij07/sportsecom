@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Akshayvij07/ecommerce/pkg/api/utilityHandler"
 	"github.com/Akshayvij07/ecommerce/pkg/helper/request"
 	"github.com/Akshayvij07/ecommerce/pkg/helper/respondse"
 	services "github.com/Akshayvij07/ecommerce/pkg/usecase/interface"
+	"github.com/Akshayvij07/ecommerce/pkg/utilityHandler"
 	"github.com/gin-gonic/gin"
 )
 

@@ -17,5 +17,7 @@ type Orderusecase interface {
 	Listorder(ctx context.Context, Orderid int, UserId int) (order domain.Orders, err error)
 	Listorders(ctx context.Context, userid int) ([]respondse.OrderResponse, error)
 	CancelOrder(ctx context.Context, orderId, userId int) error
-	UListorders(ctx context.Context, userid int) ([]respondse.OrderResponse, error) 
+	UListorders(ctx context.Context, userid int) ([]respondse.UserOrderResponse, error)
+	VerifyRazorPay(ctx context.Context, body request.RazorPayRequest) error
+	Razorpay(ctx context.Context, UserID, paymentMethodId int) (respondse.RazorPayResponse, error)
 }

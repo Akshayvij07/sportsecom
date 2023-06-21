@@ -3,13 +3,15 @@ package handler
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/Akshayvij07/ecommerce/pkg/api/utilityHandler"
+	"github.com/Akshayvij07/ecommerce/pkg/domain"
 	"github.com/Akshayvij07/ecommerce/pkg/helper/request"
 	"github.com/Akshayvij07/ecommerce/pkg/helper/respondse"
 	services "github.com/Akshayvij07/ecommerce/pkg/usecase/interface"
+	"github.com/Akshayvij07/ecommerce/pkg/utilityHandler"
 )
 
 type UserHandler struct {
@@ -231,8 +233,11 @@ func (cr *UserHandler) AddAdress(c *gin.Context) {
 	}
 
 	UserID, err := utilityHandler.GetUserIdFromContext(c)
+	if newAddress.IsDefault == nil {
+		newAddress.IsDefault = new(bool)
+	}
 
-	Address, err := cr.userUseCase.AddAdress(c, UserID, newAddress)
+	err = cr.userUseCase.AddAdress(c, UserID, newAddress, *newAddress.IsDefault)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, respondse.Response{
 			StatusCode: 400,
@@ -245,7 +250,7 @@ func (cr *UserHandler) AddAdress(c *gin.Context) {
 	c.JSON(http.StatusOK, respondse.Response{
 		StatusCode: 200,
 		Message:    "SuccessFully Added YOUR Address",
-		Data:       Address,
+		Data:       nil,
 		Errors:     nil,
 	})
 }
@@ -277,7 +282,7 @@ func (cr *UserHandler) UpdateAdress(c *gin.Context) {
 
 	UserID, err := utilityHandler.GetUserIdFromContext(c)
 
-	Address, err := cr.userUseCase.UpdateAdress(c, UserID, UpdatedAddress)
+	err = cr.userUseCase.UpdateAdress(c, UserID, UpdatedAddress)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, respondse.Response{
 			StatusCode: 400,
@@ -290,7 +295,7 @@ func (cr *UserHandler) UpdateAdress(c *gin.Context) {
 	c.JSON(http.StatusOK, respondse.Response{
 		StatusCode: 200,
 		Message:    "SuccessFully updated your address",
-		Data:       Address,
+		Data:       nil,
 		Errors:     nil,
 	})
 }
@@ -322,6 +327,141 @@ func (c *UserHandler) VeiwAddress(ctx *gin.Context) {
 			StatusCode: 200,
 			Message:    "this your Address",
 			Data:       Adress,
+			Errors:     nil,
+		})
+		return
+	}
+}
+
+// AddToWishList godoc
+// @summary api to add a product to wish list
+// @descritpion user can add product to wish list
+// @security ApiKeyAuth
+// @id AddToWishList
+// @tags Wishlist
+// @Param product_id path string true "product_id"
+// @Router /Addwishlist/{product_id} [post]
+// @Success 200 {object} respondse.Response{} "successfully added product to wishlist"
+// @Failure 400 {object} respondse.Response{} "invalid input"
+func (c *UserHandler) AddToWishList(ctx *gin.Context) {
+	paramsId := ctx.Param("id")
+	productID, err := strconv.Atoi(paramsId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, respondse.Response{
+			StatusCode: 400,
+			Message:    "can't find id",
+			Data:       nil,
+			Errors:     err.Error(),
+		})
+		return
+	}
+	userID, err := utilityHandler.GetUserIdFromContext(ctx)
+
+	var wishList = domain.WishList{
+		ProductID: uint(productID),
+		UserID:    uint(userID),
+	}
+	err = c.userUseCase.AddToWishList(ctx, wishList)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, respondse.Response{
+			StatusCode: 400,
+			Message:    "something Went Wrong",
+			Data:       nil,
+			Errors:     err.Error(),
+		})
+		return
+	}
+	{
+		ctx.JSON(http.StatusOK, respondse.Response{
+			StatusCode: 200,
+			Message:    "successfully add to whishlist",
+			Data:       wishList,
+			Errors:     nil,
+		})
+		return
+	}
+}
+
+// RemoveFromWishList godoc
+// @summary api to remove a product from wish list
+// @descritpion user can remove a product from wish list
+// @security ApiKeyAuth
+// @id RemoveFromWishList
+// @tags Wishlist
+// @Param product_id path string true "product_id"
+// @Router /Removewishlist/{product_id} [delete]
+// @Success 200 {object} respondse.Response{} "successfully removed product item from wishlist"
+// @Failure 400 {object} respondse.Response{} "invalid input"
+func (c *UserHandler) RemoveFromWishList(ctx *gin.Context) {
+	paramsId := ctx.Param("id")
+	productID, err := strconv.Atoi(paramsId)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, respondse.Response{
+			StatusCode: 400,
+			Message:    "some err to convert",
+			Data:       nil,
+			Errors:     err.Error(),
+		})
+		return
+	}
+	userID, err := utilityHandler.GetUserIdFromContext(ctx)
+
+	var wishList = domain.WishList{
+		ProductID: uint(productID),
+		UserID:    uint(userID),
+	}
+
+	if err := c.userUseCase.RemoveFromWishList(ctx, wishList); err != nil {
+		ctx.JSON(http.StatusBadRequest, respondse.Response{
+			StatusCode: 400,
+			Message:    "something Went Wrong",
+			Data:       nil,
+			Errors:     err.Error(),
+		})
+		return
+	}
+
+	{
+		ctx.JSON(http.StatusOK, respondse.Response{
+			StatusCode: 200,
+			Message:    "successfully remove from whishlist",
+			Data:       wishList,
+			Errors:     nil,
+		})
+		return
+	}
+}
+
+// GetWishListI godoc
+// @summary api get all wish list items of user
+// @descritpion user get all wish list items
+// @security ApiKeyAuth
+// @id GetWishListI
+// @tags Wishlist
+// @Router /wishlist [get]
+// @Success 200 "Successfully wish list items got"
+// @Success 200 "Wish list is empty"
+// @Failure 400  "faild to get user wish list items"
+func (u *UserHandler) GetWishList(ctx *gin.Context) {
+
+	userID, err := utilityHandler.GetUserIdFromContext(ctx)
+
+	wishList, err := u.userUseCase.ListWishlist(ctx, uint(userID))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, respondse.Response{
+			StatusCode: 400,
+			Message:    "something Went Wrong",
+			Data:       nil,
+			Errors:     err.Error(),
+		})
+		return
+	}
+
+	{
+		ctx.JSON(http.StatusOK, respondse.Response{
+			StatusCode: 200,
+			Message:    "successfully get the whishlist",
+			Data:       wishList,
 			Errors:     nil,
 		})
 		return

@@ -23,9 +23,9 @@ func NewCartRepository(DB *gorm.DB) interfaces.CartRepo {
 
 func (c *CartDataBase) AddCart(ctx context.Context, UserId int) (uint, error) {
 	var cart domain.Cart
-	query := `INSERT INTO carts(users_id,total_price)VALUES($1,$2)
+	query := `INSERT INTO carts(user_id,discount,total_price)VALUES($1,$2,$3)
 	RETURNING id`
-	if c.DB.Raw(query, UserId, 0).Scan(&cart).Error != nil {
+	if c.DB.Raw(query, UserId, 0, 0).Scan(&cart).Error != nil {
 		return 0, errors.New("failed create the cart for the user")
 	}
 	fmt.Println("cart", cart)
@@ -72,7 +72,7 @@ func (c *CartDataBase) AddCartItem(ctx context.Context, cartItem domain.CartItem
 
 func (c *CartDataBase) FindCartByUserID(ctx context.Context, UserId int) (domain.Cart, error) {
 	var cart domain.Cart
-	Find := `SELECT * FROM carts WHERE users_id = ?`
+	Find := `SELECT * FROM carts WHERE user_id = ?`
 	if c.DB.Raw(Find, UserId).Scan(&cart).Error != nil {
 		return cart, errors.New("no cart found using this user_id")
 	}

@@ -58,6 +58,7 @@ func (c *productDB) ShowCatagory(ctx context.Context, Id int) (respondse.Categor
 	err := c.DB.Raw(Query, Id).Scan(&catagory).Error
 	return catagory, err
 }
+//func(c *productDB) AddSubcatagory(ctx context.Context,req )
 
 func (c *productDB) SaveProduct(ctx context.Context, product request.Product) (respondse.Product, error) {
 	var Newproduct respondse.Product

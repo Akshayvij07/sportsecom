@@ -16,6 +16,80 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/Addwishlist/{product_id}": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "tags": [
+                    "Wishlist"
+                ],
+                "summary": "api to add a product to wish list",
+                "operationId": "AddToWishList",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "product_id",
+                        "name": "product_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successfully added product to wishlist",
+                        "schema": {
+                            "$ref": "#/definitions/respondse.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "invalid input",
+                        "schema": {
+                            "$ref": "#/definitions/respondse.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/Removewishlist/{product_id}": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "tags": [
+                    "Wishlist"
+                ],
+                "summary": "api to remove a product from wish list",
+                "operationId": "RemoveFromWishList",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "product_id",
+                        "name": "product_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "successfully removed product item from wishlist",
+                        "schema": {
+                            "$ref": "#/definitions/respondse.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "invalid input",
+                        "schema": {
+                            "$ref": "#/definitions/respondse.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/SaveAddress": {
             "post": {
                 "description": "Create a new user with the specified details.",
@@ -298,6 +372,196 @@ const docTemplate = `{
                         }
                     }
                 ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/respondse.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/respondse.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/coupon/AddCoupons": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Admin can add coupon",
+                "tags": [
+                    "Coupon"
+                ],
+                "summary": "api for add Coupons for ecommerce",
+                "operationId": "AddCoupon",
+                "parameters": [
+                    {
+                        "description": "Input true info",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.Coupon"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully productItem added to cart"
+                    },
+                    "400": {
+                        "description": "can't add the product item into cart"
+                    }
+                }
+            }
+        },
+        "/admin/coupon/Delete/{CouponID}": {
+            "delete": {
+                "description": "Admin can delete a coupon",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Coupon"
+                ],
+                "summary": "Admin can delete a coupon",
+                "operationId": "delete-coupon",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "CouponID",
+                        "name": "CouponID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/respondse.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/respondse.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/coupon/Update/{CouponID}": {
+            "patch": {
+                "description": "Admin can update existing coupon",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Coupon"
+                ],
+                "summary": "Admin can update existing coupon",
+                "operationId": "update-coupon",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "CouponID",
+                        "name": "CouponID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "details of coupon to be updated",
+                        "name": "coupon_details",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.Coupon"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/respondse.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/respondse.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/coupon/Viewcoupon/{id}": {
+            "get": {
+                "description": "Admins can see Coupons with coupon_id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Coupon"
+                ],
+                "summary": "Admins  can see Coupons with coupon_id",
+                "operationId": "find-Coupon-by-id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "CouponID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/respondse.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/respondse.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/coupon/couponlist": {
+            "get": {
+                "description": "Endpoint for getting all coupons",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Coupon"
+                ],
+                "summary": "for geting all order status list",
+                "operationId": "List-all-coupons",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1097,6 +1361,75 @@ const docTemplate = `{
                 }
             }
         },
+        "/coupon/apply/{code}": {
+            "patch": {
+                "description": "User can apply coupon to the cart",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UsersCart"
+                ],
+                "summary": "User can apply a coupon to the cart",
+                "operationId": "applay-coupon-to-cart",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "code",
+                        "name": "code",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/respondse.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/respondse.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/coupon/coupons": {
+            "get": {
+                "description": "Endpoint for getting all coupons in user side",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "summary": "for geting all coupon list",
+                "operationId": "List-all-coupons-user",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/respondse.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/respondse.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/home": {
             "get": {
                 "description": "landing page for users",
@@ -1244,7 +1577,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "UserOrder"
+                    "Cart"
                 ],
                 "summary": "Buy all items from the user's cart",
                 "operationId": "buyAll",
@@ -1537,6 +1870,28 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/wishlist": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "tags": [
+                    "Wishlist"
+                ],
+                "summary": "api get all wish list items of user",
+                "operationId": "GetWishListI",
+                "responses": {
+                    "200": {
+                        "description": "Wish list is empty"
+                    },
+                    "400": {
+                        "description": "faild to get user wish list items"
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -1591,6 +1946,9 @@ const docTemplate = `{
                 "house_number": {
                     "type": "string"
                 },
+                "is_default": {
+                    "type": "boolean"
+                },
                 "landmark": {
                     "type": "string"
                 },
@@ -1644,6 +2002,33 @@ const docTemplate = `{
             "properties": {
                 "name": {
                     "type": "string"
+                }
+            }
+        },
+        "request.Coupon": {
+            "type": "object",
+            "required": [
+                "discountpercent",
+                "expirationdate",
+                "maximumdiscountprice",
+                "minimumpurchaseamount",
+                "usagelimit"
+            ],
+            "properties": {
+                "discountpercent": {
+                    "type": "number"
+                },
+                "expirationdate": {
+                    "type": "string"
+                },
+                "maximumdiscountprice": {
+                    "type": "number"
+                },
+                "minimumpurchaseamount": {
+                    "type": "number"
+                },
+                "usagelimit": {
+                    "type": "integer"
                 }
             }
         },
