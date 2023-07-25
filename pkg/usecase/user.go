@@ -230,3 +230,8 @@ func (c *userUseCase) RemoveFromWishList(ctx context.Context, wishList domain.Wi
 func (c *userUseCase) ListWishlist(ctx context.Context, userID uint) ([]respondse.Wishlist, error) {
 	return c.userRepo.FindAllWishListItemsByUserID(ctx, userID)
 }
+
+func (c *userUseCase) GetInvoice(ctx context.Context, UserID int) (Invoice respondse.Invoice, err error) {
+	return c.userRepo.GetInvoice(ctx, UserID)
+
+}

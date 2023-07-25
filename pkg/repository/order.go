@@ -166,9 +166,7 @@ func (c *OrderDataBase) CancelOrder(ctx context.Context, orderId, userId int) er
 	return nil
 }
 
-
 //func (c *OrderDataBase) RemoveItem(ctx context.Context,)
-
 
 func (c *OrderDataBase) ClearCart(ctx context.Context, cart_id uint) error {
 	//var items request.Cartreq
@@ -191,6 +189,7 @@ func (c *OrderDataBase) Listorders(ctx context.Context) ([]respondse.OrderRespon
 	JOIN users u ON o.users_id = u.id
 	JOIN payment_methods pm ON o.payment_method_id = pm.id
 	JOIN user_addresses ua ON o.shipping_address_id = ua.id
+	JOIN addresses a ON ua.address_id = a.id 
 	JOIN order_statuses os ON o.order_status_id = os.id`
 	err := c.DB.Raw(Query).Scan(&orders).Error
 	if err != nil {

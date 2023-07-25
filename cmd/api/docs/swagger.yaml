@@ -21,10 +21,10 @@ definitions:
       count:
         minimum: 1
         type: integer
-      product_id:
-        type: integer
+      sku:
+        type: string
     required:
-    - product_id
+    - sku
     type: object
   request.AddressReq:
     properties:
@@ -62,8 +62,10 @@ definitions:
     type: object
   request.Cartreq:
     properties:
-      productId:
-        type: integer
+      sku:
+        type: string
+    required:
+    - sku
     type: object
   request.Category:
     properties:
@@ -866,6 +868,42 @@ paths:
       summary: Admin can update Product details
       tags:
       - Product
+  /admin/salesreport:
+    get:
+      consumes:
+      - application/json
+      description: Admin can view the sales report
+      operationId: view-sales-report
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: Admin can view sales report
+      tags:
+      - Admin
+  /admin/salesreport/download:
+    get:
+      consumes:
+      - application/json
+      description: Admin can download sales report in .csv format
+      operationId: download-sales-report
+      produces:
+      - application/json
+      responses:
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: Admin can download sales report
+      tags:
+      - Admin
   /admin/signup:
     post:
       consumes:
@@ -1129,6 +1167,26 @@ paths:
       summary: HomePage
       tags:
       - Users
+  /invoice:
+    get:
+      consumes:
+      - application/json
+      description: Admin can view the sales report
+      operationId: Get-Invoice
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/respondse.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/respondse.Response'
+      summary: User can view Invoice
+      tags:
+      - User
   /login:
     post:
       consumes:

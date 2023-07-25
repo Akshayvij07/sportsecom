@@ -7,6 +7,7 @@ import (
 type Product struct {
 	Id           uint   `gorm:"primaryKey;unique;not null"`
 	ProductName  string `gorm:"unique;not null"`
+	Sku          string  `gorm:"unique;not null"`
 	Description  string
 	Brand        string
 	Prize        int
@@ -24,4 +25,8 @@ type Category struct {
 	CategoryName string `gorm:"unique;not null"`
 	Created_at   time.Time
 	Updated_at   time.Time
+}
+type  ProductEnhancement struct{
+	
+
 }

@@ -58,9 +58,10 @@ func (c *productDB) ShowCatagory(ctx context.Context, Id int) (respondse.Categor
 	err := c.DB.Raw(Query, Id).Scan(&catagory).Error
 	return catagory, err
 }
+
 //func(c *productDB) AddSubcatagory(ctx context.Context,req )
 
-func (c *productDB) SaveProduct(ctx context.Context, product request.Product) (respondse.Product, error) {
+func (c *productDB) SaveProduct(ctx context.Context, product request.Product, sku string) (respondse.Product, error) {
 	var Newproduct respondse.Product
 	var exits bool
 	query1 := `select exists(select 1 from categories where id=?)`
@@ -69,10 +70,10 @@ func (c *productDB) SaveProduct(ctx context.Context, product request.Product) (r
 		return respondse.Product{}, fmt.Errorf("this catagory is not found ")
 	}
 
-	query := `INSERT INTO products (product_name, description ,brand ,prize,qty_in_stock,category_id, created_at)VALUES($1,$2,$3,$4,$5,$6,NOW())
-	RETURNING id, product_name as name, description, brand, prize, category_id `
+	query := `INSERT INTO products (product_name,description ,brand ,prize,qty_in_stock,category_id, created_at,sku)VALUES($1,$2,$3,$4,$5,$6,NOW(),$7)
+	RETURNING id, product_name as name, description, brand, prize, category_id,sku `
 	fmt.Println(product)
-	err := c.DB.Raw(query, product.Name, product.Description, product.Brand, product.Prize, product.Qty_in_stock, product.Category_Id).
+	err := c.DB.Raw(query, product.Name, product.Description, product.Brand, product.Prize, product.Qty_in_stock, product.Category_Id, sku).
 		Scan(&Newproduct).Error
 
 	return Newproduct, err
@@ -106,7 +107,7 @@ func (c *productDB) ViewAllProducts(ctx context.Context, pagination request.Pagi
 
 	// aliase :: p := product; c := category
 
-	Query := `SELECT p.id,p.product_name,p.description,p.brand,p.prize,p.qty_in_stock,p.category_id,c.category_name,p.created_at,p.updated_at
+	Query := `SELECT p.id,p.product_name,p.sku,p.description,p.brand,p.prize,p.qty_in_stock,p.category_id,c.category_name,p.created_at,p.updated_at
 	FROM products p LEFT JOIN categories c ON p.category_id=c.id
 	ORDER BY created_at DESC LIMIT $1 OFFSET $2`
 
@@ -118,7 +119,7 @@ func (c *productDB) ViewAllProducts(ctx context.Context, pagination request.Pagi
 
 func (c *productDB) ViewProduct(ctx context.Context, id int) (respondse.Product, error) {
 	var product respondse.Product
-	query := `SELECT p.id,p.product_name as name,p.description,p.brand,p.prize,p.category_id,p.qty_in_stock,c.category_name,p.created_at,p.updated_at FROM products p 
+	query := `SELECT p.id,p.product_name as name,p.sku,p.description,p.brand,p.prize,p.category_id,p.qty_in_stock,c.category_name,p.created_at,p.updated_at FROM products p 
 		JOIN categories c ON p.category_id=c.id WHERE p.id=$1`
 	err := c.DB.Raw(query, id).Scan(&product).Error
 	return product, err

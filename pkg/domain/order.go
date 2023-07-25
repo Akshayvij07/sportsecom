@@ -60,3 +60,24 @@ type PaymentDetails struct {
 	PaymentStatus   PaymentStatus `gorm:"foreignKey:PaymentStatusID" json:"-"`
 	UpdatedAt       time.Time
 }
+
+/*type Invoice struct {
+	ID          uint
+	InvoiceNumber string
+	UsersID     uint
+	Users       Users
+	OrderID     uint
+	Orders      Orders
+	Date        time.Time
+	TotalAmount float64
+}*/
+
+type OrderEnhancement struct {
+	ID             uint
+	OrderCompleted bool
+	Users          Users
+	OrderID        uint
+	Orders         Orders
+	OrderStatusID  uint
+	OrderStatus    OrderStatus
+}

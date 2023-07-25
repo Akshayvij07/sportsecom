@@ -1,10 +1,11 @@
 package utilityHandler
 
 import (
-	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	"math/rand"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -34,11 +35,23 @@ func GenerateSKU() string {
 	return hex.EncodeToString(sku)
 }
 
-
 func GenerateRandomString(length int) string {
 	sku := make([]byte, length)
 
 	rand.Read(sku)
 
 	return hex.EncodeToString(sku)
+}
+
+func GenerateInvoiceNumber() string {
+	// Get the current timestamp in milliseconds
+	timestamp := time.Now().UnixNano() / int64(time.Millisecond)
+
+	// Generate a random number between 100 and 999 (3 digits)
+	randomNum := rand.Intn(900) + 100
+
+	// Combine the timestamp and random number to create the invoice number
+	invoiceNumber := fmt.Sprintf("INV%d%03d", timestamp, randomNum)
+
+	return invoiceNumber
 }

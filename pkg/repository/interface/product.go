@@ -13,7 +13,7 @@ type ProductRepo interface {
 	DeleteCatagory(ctx context.Context, Id int) error
 	Listallcatagory(ctx context.Context) ([]respondse.Category, error)
 	ShowCatagory(ctx context.Context, Id int) (respondse.Category, error)
-	SaveProduct(ctx context.Context, product request.Product) (respondse.Product, error)
+	SaveProduct(ctx context.Context, product request.Product,sku string) (respondse.Product, error)
 	UpdateProduct(ctx context.Context, id int, product request.Product) (respondse.Product, error)
 	DeleteProduct(ctx context.Context, id int) error
 	ViewAllProducts(ctx context.Context, pagination request.Pagination) (products []respondse.Product, err error)

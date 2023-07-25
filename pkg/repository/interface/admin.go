@@ -15,4 +15,5 @@ type AdminRepository interface {
 	BlockUser(body request.BlockUser, AdminId int) error
 	UnBlockUser(id int) error
 	FindUserbyId(ctx context.Context, userId int) (domain.Users, error)
+	ViewSalesReport(ctx context.Context) ([]respondse.SalesReport, error)
 }

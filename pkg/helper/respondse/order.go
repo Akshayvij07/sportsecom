@@ -44,3 +44,21 @@ type RazorPayResponse struct {
 	AmountToPay float64
 	Total       float64
 }
+
+type Invoice struct {
+	InvoiceNumber string `json:"invoice_number`
+	//ID                uint `json:"order_ID"`
+	UsersID uint `json:"users_id"`
+	Name string
+
+	//Product string `json:"product"`
+	//Qty               int
+	OrderDate         time.Time `json:"order_date"`
+	PaymentMethodID   uint      `json:"payment_method_id"`
+	PaymentMethod     string    `json:"PaymentMethod"`
+	ShippingAddressID uint      `json:"shipping_address_id"`
+	Discount          float64   `json:"discount"`
+	OrderTotal        float64   `json:"order_total"`
+	OrderStatusID     uint      `json:"order_status_id"`
+	OrderStatus       string    `json:"order_status"`
+}

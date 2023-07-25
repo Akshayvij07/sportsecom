@@ -20,10 +20,11 @@ type UserRepository interface {
 	FindAddressByUserDetails(ctx context.Context, address request.AddressReq, userID int) (domain.Address, error)
 	SaveUserAddress(ctx context.Context, userAddress domain.UserAddress) error
 	UpdateUserAdress(ctx context.Context, userAddress domain.UserAddress) error
-	FindUserAddressById(ctx context.Context,userId int)(domain.Address,error)
+	FindUserAddressById(ctx context.Context, userId int) (domain.Address, error)
 	FindWishListItem(ctx context.Context, productID, userID uint) (domain.WishList, error)
 	FindAllWishListItemsByUserID(ctx context.Context, userID uint) ([]respondse.Wishlist, error)
 	SaveWishListItem(ctx context.Context, wishList domain.WishList) error
-	RemoveWishListItem(ctx context.Context, wishList domain.WishList) error 
+	RemoveWishListItem(ctx context.Context, wishList domain.WishList) error
 	FindProduct(ctx context.Context, id uint) (respondse.Product, error)
+	GetInvoice(ctx context.Context, UserId int) (respondse.Invoice, error)
 }
