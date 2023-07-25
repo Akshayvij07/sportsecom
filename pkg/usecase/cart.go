@@ -24,16 +24,16 @@ func NewCartUseCase(CartRepo interfaces.CartRepo) services.CartUsecase {
 
 func (c *CartUseCase) AddCartItem(ctx context.Context, body request.Cartreq) error {
 	//validate product (find product using product_id)
-	product, err := c.CartRepo.FindProduct(ctx, uint(body.ProductId))
+	product, err := c.CartRepo.FindProductBySku(ctx, body.Sku)
 
 	if err != nil {
-		return errors.New("Inavlid Product")
+		return errors.New("inavlid Product")
 	}
 
 	//check the quantity of the product and if out od stock return error
 
 	if product.Qty_in_stock == 0 {
-		return errors.New("The product is unavailable at the moment")
+		return errors.New("the product is unavailable at the moment")
 	}
 	//Find the user cart with user id
 	cart, err := c.CartRepo.FindCartByUserID(ctx, body.UserID)
@@ -47,7 +47,7 @@ func (c *CartUseCase) AddCartItem(ctx context.Context, body request.Cartreq) err
 		cart.Id = cartId
 	}
 	//add product_id and cart_id to a table cart items
-	cartItem, err := c.CartRepo.FindCartIdandProductId(ctx, uint(cart.Id), uint(body.ProductId))
+	cartItem, err := c.CartRepo.FindCartIdandProductId(ctx, uint(cart.Id), uint(product.Id))
 	if err != nil {
 		return err
 	} else if cartItem.Id != 0 {
@@ -58,7 +58,7 @@ func (c *CartUseCase) AddCartItem(ctx context.Context, body request.Cartreq) err
 	fmt.Println(cart.Id)
 	cartitem := domain.CartItem{
 		CartId:    uint(cart.Id),
-		ProductId: uint(body.ProductId),
+		ProductId: uint(product.Id),
 	}
 	if err := c.CartRepo.AddCartItem(ctx, cartitem); err != nil {
 		return err
@@ -70,7 +70,7 @@ func (c *CartUseCase) AddCartItem(ctx context.Context, body request.Cartreq) err
 
 func (c *CartUseCase) RemoveItem(ctx context.Context, body request.Cartreq) error {
 	//product validation
-	product, err := c.CartRepo.FindProduct(ctx, uint(body.ProductId))
+	product, err := c.CartRepo.FindProductBySku(ctx, body.Sku)
 	if err != nil {
 		return errors.New("invalid product")
 	}
@@ -84,7 +84,7 @@ func (c *CartUseCase) RemoveItem(ctx context.Context, body request.Cartreq) erro
 	} else if cart.Id == 0 {
 		return errors.New("unable to remove product from the cart its empty")
 	}
-	cartItem, err := c.CartRepo.FindCartIdandProductId(ctx, uint(cart.Id), uint(body.ProductId))
+	cartItem, err := c.CartRepo.FindCartIdandProductId(ctx, uint(cart.Id), uint(product.Id))
 	if err != nil {
 		return err
 	} else if cartItem.Id == 0 {
@@ -109,7 +109,7 @@ func (c *CartUseCase) FindUserCart(ctx context.Context, UserId int) (domain.Cart
 
 func (c *CartUseCase) AddQuantity(ctx context.Context, body request.Addcount) error {
 	//product validation
-	product, err := c.CartRepo.FindProduct(ctx, uint(body.ProductId))
+	product, err := c.CartRepo.FindProductBySku(ctx, body.Sku)
 	if err != nil {
 		return errors.New("invalid product")
 	}
@@ -119,7 +119,7 @@ func (c *CartUseCase) AddQuantity(ctx context.Context, body request.Addcount) er
 	if body.Count < 0 {
 		return errors.New("sorry can't enter a value less than zero")
 	} else if body.Count > int(product.Qty_in_stock) {
-		return errors.New("The product quntity limit exceeded")
+		return errors.New("the product quntity limit exceeded")
 	}
 
 	cart, err := c.CartRepo.FindCartByUserID(ctx, body.UserID)
@@ -127,7 +127,7 @@ func (c *CartUseCase) AddQuantity(ctx context.Context, body request.Addcount) er
 		return errors.New("user have no cart")
 	}
 
-	cartitem, err := c.CartRepo.FindCartIdandProductId(ctx, cart.Id, uint(body.ProductId))
+	cartitem, err := c.CartRepo.FindCartIdandProductId(ctx, cart.Id, uint(product.Id))
 	if err != nil {
 		return err
 	} else if cartitem.Id == 0 {

@@ -467,3 +467,39 @@ func (u *UserHandler) GetWishList(ctx *gin.Context) {
 		return
 	}
 }
+
+// ViewInvoice
+// @Summary User can view Invoice
+// @ID Get-Invoice
+// @Description Admin can view the sales report
+// @Tags User
+// @Accept json
+// @Produce json
+// @Success 200 {object} respondse.Response
+// @Failure 400 {object} respondse.Response
+// @Router /invoice [get]
+func (cr *UserHandler) GetInvoice(ctx *gin.Context) {
+
+	userID, err := utilityHandler.GetUserIdFromContext(ctx)
+	Invo := utilityHandler.GenerateInvoiceNumber()
+
+	Invoice, err := cr.userUseCase.GetInvoice(ctx, userID)
+	Invoice.InvoiceNumber = Invo
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, respondse.Response{
+			StatusCode: 400,
+			Message:    "cant get sales report",
+			Data:       nil,
+			Errors:     err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, respondse.Response{
+		StatusCode: 200,
+		Message:    "Invoice",
+		Data:       Invoice,
+		Errors:     nil,
+	})
+
+}

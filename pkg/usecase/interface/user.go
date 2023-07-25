@@ -19,4 +19,5 @@ type UserUseCase interface {
 	ListWishlist(ctx context.Context, userID uint) ([]respondse.Wishlist, error)
 	RemoveFromWishList(ctx context.Context, wishList domain.WishList) error
 	AddToWishList(ctx context.Context, wishList domain.WishList) error
+	GetInvoice(ctx context.Context, UserID int) (Invoice respondse.Invoice, err error)
 }

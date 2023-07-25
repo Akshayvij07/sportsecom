@@ -8,6 +8,7 @@ type Category struct {
 type Product struct {
 	Id           int `json:",omitempty"`
 	Name         string
+	Sku          string
 	Description  string
 	Prize        int
 	Qty_in_stock int

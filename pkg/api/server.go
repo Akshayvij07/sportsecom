@@ -54,6 +54,7 @@ func NewServerHTTP(userHandler *handler.UserHandler,
 		user.POST("Addwishlist/:id", userHandler.AddToWishList)
 		user.DELETE("/Removewishlist/:id", userHandler.RemoveFromWishList)
 		user.GET("wishlist", userHandler.GetWishList)
+		user.GET("invoice", userHandler.GetInvoice)
 		category := user.Group("/category")
 		{
 			category.GET("showall", ProductHandler.ListCategories)
@@ -98,6 +99,8 @@ func NewServerHTTP(userHandler *handler.UserHandler,
 		admin.GET("/finduser/:user_id", AdminHandler.FindUserByID)
 		admin.PATCH("/block", AdminHandler.BlockUser)
 		admin.PATCH("/unblock/:user_id", AdminHandler.UnblockUser)
+		admin.GET("/salesreport", AdminHandler.ViewSalesReport)
+		admin.GET("/salesreport/download", AdminHandler.DownloadSalesReport)
 		//category
 		category := admin.Group("/category")
 		{

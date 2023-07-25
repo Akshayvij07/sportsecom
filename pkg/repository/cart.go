@@ -32,11 +32,18 @@ func (c *CartDataBase) AddCart(ctx context.Context, UserId int) (uint, error) {
 	return cart.Id, nil
 }
 
-func (c *CartDataBase) FindProduct(ctx context.Context, id uint) (respondse.Product, error) {
+func (c *CartDataBase) FindProduct(ctx context.Context, id int) (respondse.Product, error) {
 	var product respondse.Product
 	Query := `SELECT p.id,p.product_name as name,p.description,p.brand,p.prize,p.category_id,p.qty_in_stock,c.category_name,p.created_at,p.updated_at FROM products p 
-	JOIN categories c ON p.category_id=c.id WHERE p.id=$1`
+	JOIN categories c ON p.category_id=c.id WHERE p.sku=$1`
 	err := c.DB.Raw(Query, id).Scan(&product).Error
+	return product, err
+}
+func (c *CartDataBase) FindProductBySku(ctx context.Context, sku string) (respondse.Product, error) {
+	var product respondse.Product
+	Query := `SELECT p.id,p.product_name as name,p.description,p.brand,p.prize,p.category_id,p.qty_in_stock,c.category_name,p.created_at,p.updated_at FROM products p 
+	JOIN categories c ON p.category_id=c.id WHERE p.sku=$1`
+	err := c.DB.Raw(Query, sku).Scan(&product).Error
 	return product, err
 }
 

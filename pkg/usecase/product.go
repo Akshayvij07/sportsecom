@@ -7,6 +7,7 @@ import (
 	"github.com/Akshayvij07/ecommerce/pkg/helper/respondse"
 	interfaces "github.com/Akshayvij07/ecommerce/pkg/repository/interface"
 	services "github.com/Akshayvij07/ecommerce/pkg/usecase/interface"
+	"github.com/Akshayvij07/ecommerce/pkg/utilityHandler"
 )
 
 type ProductUsecase struct {
@@ -48,7 +49,10 @@ func (p *ProductUsecase) ShowCatagory(ctx context.Context, Id int) (respondse.Ca
 }
 
 func (p *ProductUsecase) SaveProduct(ctx context.Context, product request.Product) (respondse.Product, error) {
-	newproduct, err := p.ProductRepo.SaveProduct(ctx, product)
+
+	sku:=utilityHandler.GenerateSKU()
+	newproduct, err := p.ProductRepo.SaveProduct(ctx, product,sku)
+
 	return newproduct, err
 }
 

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/csv"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -279,7 +280,7 @@ func (cr *AdminHandler) FindAllUser(c *gin.Context) {
 		Data:       users,
 		Errors:     nil,
 	})
-	return
+
 }
 
 // FindUserByID
@@ -309,5 +310,89 @@ func (cr *AdminHandler) FindUserByID(c *gin.Context) {
 	c.JSON(http.StatusOK, respondse.Response{
 		StatusCode: 200, Message: "Successfully fetched user details", Data: user, Errors: nil,
 	})
+
+}
+
+// ViewSalesReport
+// @Summary Admin can view sales report
+// @ID view-sales-report
+// @Description Admin can view the sales report
+// @Tags Admin
+// @Accept json
+// @Produce json
+// @Success 200 {object} respondse.Response
+// @Failure 400 {object} respondse.Response
+// @Router /admin/salesreport [get]
+func (cr *AdminHandler) ViewSalesReport(ctx *gin.Context) {
+	sales, err := cr.AdminUsecase.ViewSalesReport(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, respondse.Response{
+			StatusCode: 400,
+			Message:    "cant get sales report",
+			Data:       nil,
+			Errors:     err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, respondse.Response{
+		StatusCode: 200,
+		Message:    "Sales report",
+		Data:       sales,
+		Errors:     nil,
+	})
+
+}
+
+// DownloadSalesReport
+// @Summary Admin can download sales report
+// @ID download-sales-report
+// @Description Admin can download sales report in .csv format
+// @Tags Admin
+// @Accept json
+// @Produce json
+// @Failure 400 {object} respondse.Response
+// @Router /admin/salesreport/download [get]
+func (cr *AdminHandler) DownloadSalesReport(ctx *gin.Context) {
+	sales, err := cr.AdminUsecase.ViewSalesReport(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, respondse.Response{
+			StatusCode: 400,
+			Message:    "cant get sales report",
+			Data:       nil,
+			Errors:     err.Error(),
+		})
+		return
+	}
+	// Set headers so browser will download the file
+	ctx.Header("Content-Type", "text/csv")
+	ctx.Header("Content-Disposition", "attachment;filename=sales.csv")
+
+	// Create a CSV writer using our response writer as our io.Writer
+	wr := csv.NewWriter(ctx.Writer)
+
+	// Write CSV header row
+	headers := []string{"Id", "Name", "Payment_method", "OrderDate", "Order_Total", "Mobile", "HouseNumber", "Pincode"}
+	if err := wr.Write(headers); err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	// Write data rows
+	for _, sale := range sales {
+		row := []string{sale.Id, sale.Name, sale.Payment_method, sale.OrderDate.Format("2006-01-02 15:04:05"), strconv.Itoa(sale.Order_Total),
+			sale.Mobile, sale.HouseNumber, sale.Pincode,
+		}
+		if err := wr.Write(row); err != nil {
+			ctx.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+	}
+	// Flush the writer's buffer to ensure all data is written to the client
+	wr.Flush()
+	if err := wr.Error(); err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
 
 }

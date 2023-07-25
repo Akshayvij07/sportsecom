@@ -1050,6 +1050,60 @@ const docTemplate = `{
                 }
             }
         },
+        "/admin/salesreport": {
+            "get": {
+                "description": "Admin can view the sales report",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Admin can view sales report",
+                "operationId": "view-sales-report",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/respondse.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/respondse.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/salesreport/download": {
+            "get": {
+                "description": "Admin can download sales report in .csv format",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Admin can download sales report",
+                "operationId": "download-sales-report",
+                "responses": {
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/respondse.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/admin/signup": {
             "post": {
                 "description": "Save admin with details",
@@ -1444,6 +1498,36 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "failed"
+                    }
+                }
+            }
+        },
+        "/invoice": {
+            "get": {
+                "description": "Admin can view the sales report",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "User can view Invoice",
+                "operationId": "Get-Invoice",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/respondse.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/respondse.Response"
+                        }
                     }
                 }
             }
@@ -1922,15 +2006,15 @@ const docTemplate = `{
         "request.Addcount": {
             "type": "object",
             "required": [
-                "product_id"
+                "sku"
             ],
             "properties": {
                 "count": {
                     "type": "integer",
                     "minimum": 1
                 },
-                "product_id": {
-                    "type": "integer"
+                "sku": {
+                    "type": "string"
                 }
             }
         },
@@ -1988,9 +2072,12 @@ const docTemplate = `{
         },
         "request.Cartreq": {
             "type": "object",
+            "required": [
+                "sku"
+            ],
             "properties": {
-                "productId": {
-                    "type": "integer"
+                "sku": {
+                    "type": "string"
                 }
             }
         },

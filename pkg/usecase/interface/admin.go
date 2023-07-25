@@ -15,4 +15,5 @@ type AdminUsecase interface {
 	BlockUser(body request.BlockUser, adminId int) error
 	UnBlockUser(id int) error
 	FindUserbyId(ctx context.Context, userID int) (domain.Users, error)
+	ViewSalesReport(ctx context.Context) ([]respondse.SalesReport, error)
 }

@@ -246,3 +246,19 @@ func (c *userDatabase) FindProduct(ctx context.Context, id uint) (respondse.Prod
 	err := c.DB.Raw(query, id).Scan(&product).Error
 	return product, err
 }
+
+func (c *userDatabase) GetInvoice(ctx context.Context, UserId int) (respondse.Invoice, error) {
+	var Invoice respondse.Invoice
+	query := ` SELECT o.users_id,u.name,o.order_date,o.payment_method_id,pm.payment_method,o.shipping_address_id,
+	o.discount,o.order_total,o.order_status_id,os.order_status
+	FROM orders o
+	JOIN users u ON o.users_id = u.id
+	JOIN payment_methods pm ON o.payment_method_id = pm.id
+	JOIN user_addresses ua ON o.shipping_address_id = ua.id  
+	JOIN order_statuses os ON o.order_status_id = os.id
+	
+
+	WHERE o.users_id = $1 `
+	err := c.DB.Raw(query, UserId).Scan(&Invoice).Error
+	return Invoice, err
+}
