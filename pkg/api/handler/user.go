@@ -54,7 +54,7 @@ func (cr *UserHandler) SignUp(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, respondse.Response{
 			StatusCode: 400,
-			Message:    "unable signUp",
+			Message:    "Unable to SignUP",
 			Data:       nil,
 			Errors:     err.Error(),
 		})

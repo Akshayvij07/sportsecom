@@ -115,3 +115,11 @@ func (c *CartDataBase) FindCartlistByCartID(ctx context.Context, cartID uint) (c
 	}
 	return cartitems, err
 }
+
+func (c *CartDataBase) RemoveAllCartItems(ctx context.Context, cartID uint64) error {
+
+	query := `DELETE FROM cart_items WHERE cart_id = $1`
+	err := c.DB.Exec(query, cartID).Error
+
+	return err
+}

@@ -271,5 +271,22 @@ func (c *OrderDataBase) UpdateOrderStatus(ctx context.Context, update request.Up
 	if err != nil {
 		return err
 	}
+
 	return nil
+}
+
+func (c *OrderDataBase) RemoveCarItems(ctx context.Context, CartItemId uint) error {
+	Query := `DELETE FROM cart_items WHERE id = $1`
+	if c.DB.Exec(Query, CartItemId).Error != nil {
+		return errors.New("failed to remove item from the cart")
+	}
+	return nil
+}
+func (c *OrderDataBase) FindCartByUserID(ctx context.Context, UserId int) (domain.Cart, error) {
+	var cart domain.Cart
+	Find := `SELECT * FROM carts WHERE user_id = ?`
+	if c.DB.Raw(Find, UserId).Scan(&cart).Error != nil {
+		return cart, errors.New("no cart found using this user_id")
+	}
+	return cart, nil
 }

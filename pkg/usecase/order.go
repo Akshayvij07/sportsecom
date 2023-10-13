@@ -149,7 +149,14 @@ func (c *Orderusecase) VerifyRazorPay(ctx context.Context, body request.RazorPay
 	if payment["status"] != "captured" {
 		return errors.New("faild to verify razorpay payment")
 	}
-	
 
 	return nil
+}
+
+func (c *Orderusecase) RemoveCartItems(ctx context.Context, userId uint) error {
+	cartId, err := c.orderRepo.FindCartByUserID(ctx, int(userId))
+	if err != nil {
+		return fmt.Errorf("cart not deleted")
+	}
+	return c.RemoveCartItems(ctx, cartId.Id)
 }

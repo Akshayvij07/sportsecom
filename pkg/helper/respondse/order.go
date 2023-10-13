@@ -47,7 +47,7 @@ type RazorPayResponse struct {
 
 type Invoice struct {
 	InvoiceNumber string `json:"invoice_number`
-	//ID                uint `json:"order_ID"`
+	OrderID                uint `json:"order_id"`
 	UsersID uint `json:"users_id"`
 	Name string
 

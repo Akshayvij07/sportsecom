@@ -176,6 +176,8 @@ func (cr *OrderHandler) RazorpayVerify(ctx *gin.Context) {
 		Data:       order,
 		Errors:     nil,
 	})
+	cr.OrderUseCase.RemoveCartItems(ctx, uint(userId))
+
 }
 
 // CancelOrder

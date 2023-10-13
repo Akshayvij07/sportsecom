@@ -276,7 +276,7 @@ func (cr *CouponHandler) ApplyCoupon(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, respondse.Response{
 		StatusCode: 200,
 		Message:    "coupen applyed",
-		Data:       []interface{}{"rate after coupen applaid is ", discount},
+		Data:       []interface{}{"Price after applying coupon", discount},
 		Errors:     nil,
 	})
 

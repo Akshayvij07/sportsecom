@@ -30,3 +30,5 @@ var (
 	AFTER INSERT OR UPDATE OR DELETE ON cart_items 
 	FOR EACH ROW EXECUTE FUNCTION update_cart_total();`
 )
+
+

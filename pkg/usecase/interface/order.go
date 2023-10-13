@@ -20,4 +20,6 @@ type Orderusecase interface {
 	UListorders(ctx context.Context, userid int) ([]respondse.UserOrderResponse, error)
 	VerifyRazorPay(ctx context.Context, body request.RazorPayRequest) error
 	Razorpay(ctx context.Context, UserID, paymentMethodId int) (respondse.RazorPayResponse, error)
+	RemoveCartItems(ctx context.Context, userId uint) error
+	
 }

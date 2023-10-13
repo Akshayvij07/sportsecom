@@ -17,5 +17,9 @@ type OrderRepo interface {
 	Listorder(ctx context.Context, Orderid int, UserId int) (order domain.Orders, err error)
 	Listorders(ctx context.Context) ([]respondse.OrderResponse, error)
 	CancelOrder(ctx context.Context, orderId, userId int) error
-	UListorders(ctx context.Context,UserId int) ([]respondse.UserOrderResponse, error)
+	UListorders(ctx context.Context, UserId int) ([]respondse.UserOrderResponse, error)
+	RemoveCarItems(ctx context.Context, CartItemId uint) error
+	FindCartByUserID(ctx context.Context, UserId int) (domain.Cart, error)
+	FindWalletByUserID(ctx context.Context, UserId int) (domain.Wallet, error)
+	SaveWallet(ctx context.Context, UserId int) (uint, error)
 }

@@ -39,12 +39,12 @@ type CartItem struct {
 }*/
 
 type UserAddress struct {
-	ID        uint    `json:"id" gorm:"primaryKey;unique"`
-	UsersID   uint    `json:"users_id" gorm:"not null"`
-	Users     Users  
-	AddressID uint    `json:"address_id" gorm:"not null"`
-	Address   Address 
-	IsDefault bool    `json:"is_default"`
+	ID        uint `json:"id" gorm:"primaryKey;unique"`
+	UsersID   uint `json:"users_id" gorm:"not null"`
+	Users     Users
+	AddressID uint `json:"address_id" gorm:"not null"`
+	Address   Address
+	IsDefault bool `json:"is_default"`
 }
 
 type Address struct {
@@ -57,4 +57,27 @@ type Address struct {
 	Landmark    string    `json:"landmark"`
 	CreatedAt   time.Time `json:"created_at" gorm:"not null"`
 	UpdatedAt   time.Time `json:"updated_at"`
+}
+
+type Wallet struct {
+	ID          uint  `json:"wallet_id" gorm:"primaryKey;not null"`
+	UsersID     uint  `json:"users_id" gorm:"not null"`
+	Users       Users `json:"-"`
+	TotalAmount uint  `json:"total_amount" gorm:"not null"`
+}
+
+type TransactionType string
+
+const (
+	Debit  TransactionType = "DEBIT"
+	Credit TransactionType = "CREDIT"
+)
+
+type Transaction struct {
+	TransactionID   uint            `json:"transaction_id" gorm:"primaryKey;not null"`
+	WalletID        uint            `json:"wallet_id" gorm:"not null"`
+	Wallet          Wallet          `json:"-"`
+	TransactionDate time.Time       `json:"transaction_time" gorm:"not null"`
+	Amount          uint            `json:"amount" gorm:"not null"`
+	TransactionType TransactionType `json:"transaction_type" gorm:"not null"`
 }

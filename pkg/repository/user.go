@@ -249,7 +249,7 @@ func (c *userDatabase) FindProduct(ctx context.Context, id uint) (respondse.Prod
 
 func (c *userDatabase) GetInvoice(ctx context.Context, UserId int) (respondse.Invoice, error) {
 	var Invoice respondse.Invoice
-	query := ` SELECT o.users_id,u.name,o.order_date,o.payment_method_id,pm.payment_method,o.shipping_address_id,
+	query := ` SELECT o.id AS order_id,o.users_id,u.name,o.order_date,o.payment_method_id,pm.payment_method,o.shipping_address_id,
 	o.discount,o.order_total,o.order_status_id,os.order_status
 	FROM orders o
 	JOIN users u ON o.users_id = u.id
