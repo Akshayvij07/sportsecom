@@ -23,7 +23,7 @@ func NewServerHTTP(userHandler *handler.UserHandler,
 	// Use logger from Gin
 	engine.Use(gin.Logger())
 
-	engine.LoadHTMLGlob("./*html")
+	engine.LoadHTMLGlob("templates/*.html")
 
 	// Swagger docs
 	engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))

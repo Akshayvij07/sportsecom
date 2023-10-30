@@ -138,7 +138,7 @@ func TestUserLogin(t *testing.T) {
 			buildStub: func(mock sqlmock.Sqlmock) {
 				mock.ExpectQuery(`SELECT \* FROM users WHERE email\=?`).
 					WithArgs("sreenathsvrm@gmail.com").
-					WillReturnRows(sqlmock.NewRows([]string{"id", "name", "email", "mobile", "password", "is_blocked", "created_at"}).
+					WillReturnRows(sqlmock.NewRows([]string{"id", "name", "email", "mobile", "password", "is_blocked", "created"}).
 						AddRow(1, "sreenath", "sreenathsvrm@gmail.com", "+917994475799", "sree@123", false, time.Time{}))
 
 			},

@@ -41,7 +41,7 @@ func TestUserSignup(t *testing.T) {
 				Password: "akshay@123",
 			},
 			buildStub: func(userUseCase mockusecase.MockUserUseCase) {
-				userUseCase.EXPECT().Signup(gomock.Any(), request.UserSign{
+				userUseCase.EXPECT().SignUp(gomock.Any(), request.UserSign{
 					Name:     "Akshay",
 					Email:    "akshay@gmail.com",
 					Phone:    "+919562461825",
@@ -84,7 +84,7 @@ func TestUserSignup(t *testing.T) {
 				Password: "akshay@123",
 			},
 			buildStub: func(userUseCase mockusecase.MockUserUseCase) {
-				userUseCase.EXPECT().Signup(gomock.Any(), request.UserSign{
+				userUseCase.EXPECT().SignUp(gomock.Any(), request.UserSign{
 					Name:     "Akshay",
 					Email:    "akshay@gmail.com",
 					Phone:    "+919562461825",
@@ -111,7 +111,7 @@ func TestUserSignup(t *testing.T) {
 			tc.buildStub(*userUseCase)
 
 			server := gin.New()
-			server.POST("/signup", userHandler.SignUp)
+			server.POST("/SignUp", userHandler.SignUp)
 
 			jsonData, err := json.Marshal(&tc.input)
 			assert.NoError(t, err)

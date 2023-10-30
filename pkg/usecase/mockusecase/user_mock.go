@@ -148,7 +148,7 @@ func (m *MockUserUseCase) SignUp(ctx context.Context, user requests.UserSign) (r
 }
 
 // UserSignup indicates an expected call of UserSignup.
-func (mr *MockUserUseCaseMockRecorder) Signup(ctx, user interface{}) *gomock.Call {
+func (mr *MockUserUseCaseMockRecorder) SignUp(ctx, user interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SignUp", reflect.TypeOf((*MockUserUseCase)(nil).SignUp), ctx, user)
 }

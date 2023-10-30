@@ -1,0 +1,44 @@
+version: '3'
+services:
+  # database container
+  postgresdb:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_HOST=${DB_HOST}
+    networks:
+      - ecommerce-network
+    volumes:
+      - database:/var/lib/postgresql/data
+
+  # webapp container
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: akshayvj07/sportsecom
+    ports:
+      - 3000:3000
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=postgresdb  # Set this to the actual database host 
+      - DB_USER=akshay
+      - DB_PASSWORD=password
+      - DB_NAME=ecommerce
+      - DB_PORT=5432
+    depends_on:
+      - postgresdb
+    restart: on-failure
+    networks:
+      - ecommerce-network
+
+# for persistent data storage
+volumes:
+  database:
+
+networks:
+  ecommerce-network:
+    driver: bridge

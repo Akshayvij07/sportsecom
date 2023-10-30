@@ -58,10 +58,10 @@ func TestUserSignup(t *testing.T) {
 		{
 			name: "FailedToSaveUserOnDatabase",
 			input: request.UserSign{
-				Name:     "sreenath",
-				Email:    "sreenath@gmail.com",
-				Phone:    "7994475799",
-				Password: "sreenath@123",
+				Name:     "Akshay",
+				Email:    "akshay@gmail.com",
+				Phone:    "9562461825",
+				Password: "akshay@123",
 			},
 			buildStub: func(userRepo *mockrepo.MockUserRepository, user request.UserSign) {
 
@@ -74,25 +74,25 @@ func TestUserSignup(t *testing.T) {
 		{
 			name: "SuccessSignup",
 			input: request.UserSign{
-				Name:     "sreenath",
-				Email:    "sreenath@gmail.com",
-				Phone:    "7994475799",
-				Password: "sreenath@123",
+				Name:     "Akshay",
+				Email:    "akshay@gmail.com",
+				Phone:    "9562461825",
+				Password: "akshay@123",
 			},
 			buildStub: func(userRepo *mockrepo.MockUserRepository, user request.UserSign) {
 				userRepo.EXPECT().UserSignup(gomock.Any(), EqCreateUserParams(user, user.Password)).Times(1).
 					Return(respondse.UserValue{
 						ID:       1,
-						Name:     "sreenath",
-						Email:    "sree@gmail.com",
+						Name:     "Akshay",
+						Email:    "akshay@gmail.com",
 						Password: "hashed password",
 						Created:  constTime,
 					}, nil)
 			},
 			expectedOutput: respondse.UserValue{
 				ID:       1,
-				Name:     "sreenath",
-				Email:    "sree@gmail.com",
+				Name:     "akshay",
+				Email:    "akshay@gmail.com",
 				Password: "hashed password",
 				Created:  constTime,
 			},
@@ -136,11 +136,11 @@ func TestLoginWithEmail(t *testing.T) {
 		{
 			name: "get details from database",
 			input: request.Login{
-				Email:    "sreenathsvrm@gmail.com",
-				Password: "sree@123",
+				Email:    "akshay123@gmail.com",
+				Password: "akshay@123",
 			},
 			buildStub: func(userRepo *mockrepo.MockUserRepository) {
-				userRepo.EXPECT().UserLogin(gomock.Any(), "sreenathsvrm@gmail.com").Times(1).
+				userRepo.EXPECT().UserLogin(gomock.Any(), "akshay123@gmail.com").Times(1).
 					Return(domain.Users{}, errors.New("no user found"))
 			},
 			isExpectingOutput: false,
@@ -150,15 +150,15 @@ func TestLoginWithEmail(t *testing.T) {
 		{
 			name: "blocked user",
 			input: request.Login{
-				Email:    "sreenathsvrm@gmail.com",
-				Password: "sree@123",
+				Email:    "akshay123@gmail.com",
+				Password: "akshay@123",
 			},
 			buildStub: func(userRepo *mockrepo.MockUserRepository) {
-				userRepo.EXPECT().UserLogin(gomock.Any(), "sreenathsvrm@gmail.com").Times(1).
+				userRepo.EXPECT().UserLogin(gomock.Any(), "akshay123@gmail.com").Times(1).
 					Return(domain.Users{
 						ID:        1,
-						Email:     "sreenathsvrm@gmail.com",
-						Password:  "sree@123",
+						Email:     "akshay123@gmail.com",
+						Password:  "akshay@123",
 						IsBlocked: true,
 					}, errors.New("user is blocked"))
 			},
@@ -169,15 +169,15 @@ func TestLoginWithEmail(t *testing.T) {
 		{
 			name: "blocked user",
 			input: request.Login{
-				Email:    "sreenathsvrm@gmail.com",
-				Password: "sree@123",
+				Email:    "akshay123@gmail.com",
+				Password: "akshay@123",
 			},
 			buildStub: func(userRepo *mockrepo.MockUserRepository) {
-				userRepo.EXPECT().UserLogin(gomock.Any(), "sreenathsvrm@gmail.com").Times(1).
+				userRepo.EXPECT().UserLogin(gomock.Any(), "akshay123@gmail.com").Times(1).
 					Return(domain.Users{
 						ID:        1,
-						Email:     "sreenathsvrm@gmail.com",
-						Password:  "sree@123",
+						Email:     "akshay123@gmail.com",
+						Password:  "akshay@123",
 						IsBlocked: true,
 					}, errors.New("user is blocked"))
 			},
@@ -186,20 +186,20 @@ func TestLoginWithEmail(t *testing.T) {
 		},
 
 		{
-			name: "successfull login to watch shop",
+			name: "successfull logged into sportsecom",
 			input: request.Login{
-				Email:    "sreenathsvrm@gmail.com",
-				Password: "sree@123",
+				Email:    "akshay123@gmail.com",
+				Password: "akshay@123",
 			},
 			buildStub: func(userRepo *mockrepo.MockUserRepository) {
-				hashedPassword, err := bcrypt.GenerateFromPassword([]byte("sree@123"), 10)
+				hashedPassword, err := bcrypt.GenerateFromPassword([]byte("akshay@123"), 10)
 				if err != nil {
 					t.Fatalf("")
 				}
-				userRepo.EXPECT().UserLogin(gomock.Any(), "sreenathsvrm@gmail.com").Times(1).
+				userRepo.EXPECT().UserLogin(gomock.Any(), "akshay123@gmail.com").Times(1).
 					Return(domain.Users{
 						ID:        1,
-						Email:     "sreenathsvrm@gmail.com",
+						Email:     "akshay123@gmail.com",
 						Password:  string(hashedPassword),
 						IsBlocked: false,
 					}, nil)
