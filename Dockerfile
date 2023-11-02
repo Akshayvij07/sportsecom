@@ -63,7 +63,6 @@ RUN  go mod download
 COPY cmd cmd/
 COPY pkg pkg/
 COPY templates templates/
-
 # build the executable file
 RUN go build -v -o ./build/api ./cmd/api
 
