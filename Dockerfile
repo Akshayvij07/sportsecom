@@ -73,5 +73,6 @@ WORKDIR /app
 # copy the binay file and html files
 COPY --from=build-stage /app/build/api api
 COPY --from=build-stage /app/templates templates/
+ENV test = 123
 
 CMD ["/app/api"]
